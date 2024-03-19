@@ -1,2 +1,3 @@
-# street-whisper-app
-Repository for STREET Whisper Transcription App's application code.
+# STREET Whisper Transcription App
+
+Link to Python Scripts: https://github.com/carmen-chau/StreetWhisperCode
