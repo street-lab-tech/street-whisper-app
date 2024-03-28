@@ -1,3 +1,4 @@
+from backend import whisper_with_diarization_as_methods
 import typer
 from PyInquirer import prompt
 from rich import print as rprint
@@ -7,8 +8,10 @@ app = typer.Typer()
 
 @app.command("start")
 def questions_ui():
-    rprint("[blue]=============================[blue]")
-    # Process selection 
+    rprint("[magenta]=============================[magenta]")
+    rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
+    rprint("[magenta]=============================[magenta]")
+    # Process selection
     translation_transcription_prompt = [
             {
                 'type': 'list',
@@ -28,11 +31,11 @@ def questions_ui():
             }
         ]
     process_selected = prompt(translation_transcription_prompt)
-    # Input file 
+    # Input file
     rprint("[blue]=============================[blue]")
     rprint(f"[bold]Enter the absolute path to the audio file you want to do the \"{process_selected['process_selected']}\" process on:[bold]")
     input_file = input()
-    
+
     rprint("[blue]=============================[blue]")
     # Is Input File in English?
     to_eng_selection_prompt = [
@@ -51,7 +54,7 @@ def questions_ui():
             }
         ]
     to_english_selection = prompt(to_eng_selection_prompt)
-    
+
     rprint("[blue]=============================[blue]")
     # Model size selection
     model_size_selection_prompt = [
@@ -61,23 +64,23 @@ def questions_ui():
                 'message': 'What model size do you want to use on your audio file?',
                 'choices': [
                             {
-                                'name': 'Large-V2',
+                                'name': 'large-v2',
                             },
                             {
-                                'name': 'Small',
+                                'name': 'small',
                             },
                             {
-                                'name': 'Medium',
+                                'name': 'medium',
                             },
                 ],
             }
         ]
     model_size_selection = prompt(model_size_selection_prompt)
     rprint("[blue]=============================[blue]")
-    # Destination Folder 
+    # Destination Folder
     rprint(f"[bold]Enter the absolute path to your destination folder:[bold]")
     destination_selection = input()
-    
+
     rprint("[blue]=============================[blue]")
     questions_finished_prompt = [
             {
@@ -96,14 +99,22 @@ def questions_ui():
         ]
     questions_finished = prompt(questions_finished_prompt)
     if questions_finished["questions_finished"] == 'Yes':
-        run_process(process_selected, input_file, to_english_selection, model_size_selection, destination_selection)
+        run_process(process_selected["process_selected"], input_file, to_english_selection["to_english_selection"], model_size_selection["model_size_selection"], destination_selection)
     else:
         typer.Exit()
-    
-    
+
 def run_process(process_selected, input_file, to_english_selection, model_size_selection, destination_selection):
-    # TO DO: Call backend scripts here  
-    return
+    whisper_with_diarization_as_methods.main(str(process_selected), str(input_file), bool(to_english_selection), str(model_size_selection), str(destination_selection))
+    # return
     
+@app.command("help")
+def help_ui(): 
+    rprint("[magenta]=============================[magenta]")
+    rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
+    rprint("")
+    rprint("[bold]Help[bold]")
+    rprint("[magenta]=============================[magenta]")
+    
+
 if __name__ == "__main__":
-    app()  
+    app()
