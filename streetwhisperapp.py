@@ -105,7 +105,6 @@ def questions_ui():
 
 def run_process(process_selected, input_file, to_english_selection, model_size_selection, destination_selection):
     whisper_with_diarization_as_methods.main(str(process_selected), str(input_file), bool(to_english_selection), str(model_size_selection), str(destination_selection))
-    # return
     
 @app.command("help")
 def help_ui(): 
