@@ -1,6 +1,6 @@
-# Import statements
+## Import statements ##
 import whisper
-import whisperx # TODO NOTE: In the env installation instructions (coming soon!), this whisperx package is actually a smaller version of the original whisperx. It only contains the files necessary to run speaker diarization.
+# import whisperx # TODO NOTE: In the env installation instructions (coming soon!), this whisperx package is actually a smaller version of the original whisperx. It only contains the files necessary to run speaker diarization.
 # import pandas as pd # Commented out import since the method importing it is not in current use
 import csv
 import time
@@ -10,6 +10,7 @@ from typing import Any, List, Optional
 from pyannote.audio import Pipeline
 from backend.merge_timestamps import diarize_text
 from iso639 import Lang
+import torch
 
 
 def validate_audio_file(audio_file_path: str) -> bool:
@@ -296,7 +297,7 @@ def write_audio_text_obj_to_csv(csv_headers: List[str], csv_file_path: str, comb
 
             csv_writer.writerow(row_to_write)
 
-def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str) -> None:
+def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str, output_csv_headers: List[str]) -> None:
     """
     This method writes a list of strings (which is the expected output from the method gen_group_speakers_csv_content
     into a CSV file with path defined by parameter output_csv_path
@@ -344,24 +345,25 @@ def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str) -> N
 #     data3 = pd.concat([data2, eng_column], axis=1)
 #     data3.to_csv(comb_lang_csv_file, encoding='utf-8', index=False)
 
-def main(process_selected: str, input_file: str, to_english_selection: bool, model_size_selection: str, destination_selection: str):
+def main(process_selected: str, input_file: str, to_english_selection: bool, model_size_selection: str, destination_selection: str, diarize_model):
     # Step 1: Defining input audio path + defining CSV Headers
     input_audio_path = input_file # Insert audio file name and extension here (extensions can include: .mp3, .wav)
     output_csv_headers = [] # Insert your headers here by replacing values of empty strings. Eg: ["Timestamps", "Speaker No", "Text[Eng]"]
     if process_selected == "Transcription Only":
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"]
-    elif process_selected == "Translation Only":
-        output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
     else:
-        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]", "Text[Eng]"]
+        output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
+    #elif process_selected == "Translation Only":
+    #    output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
+    #else:
+    #    output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]", "Text[Eng]"]
     the_date_time = str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":", "_").replace(".", "_")
-    output_csv_path = f'{destination_selection}/{the_date_time}_streetwhisperapp.csv' 
+    output_csv_path = destination_selection + "/" + the_date_time + "_" + "streetwhisperapp.csv"
     translate_to_english = to_english_selection # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
     # Step 2: Check if audio file is in valid format
     is_valid_audio_file = validate_audio_file(input_audio_path)
     if (is_valid_audio_file):
-
         # Step 3: Defining whisper model
         loaded_whisper_model = define_whisper_model(model_size_selection)
         # loaded_whisper_model = define_whisper_model(f'whisper_models/{model_size_selection}.pt')  # Insert .pt model to replace the "xxxx.pt" placeholder text
@@ -370,34 +372,59 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path)
         print("")
         print(f'Detected language in input audio file: {whisper_detect_lang}')
-
+        print("")
         # Step 5: Conducting speaker diarization on the file (this step is the same for both transcription and translation)
         # TODO: Using a possible check (using an intermediate variable denoting whether or not diarization is complete...
         # TODO (CONT): ... + using the https://pypi.org/project/progress/ library, can add a spinner to denote diarization running
-        print("Audio diarization has started, in progress")
-        diarize_model = whisperx.DiarizationPipeline(device="cpu")
-        print("Audio diarization has completed")
-        diarization_result = diarize_model(input_audio_path)
+        print("Speaker diarization has started, in progress")
+        print("")
+        diarize_model = diarize_model
+        the_audio = whisper.load_audio(input_audio_path, 16000)
+        audio_data = {
+            'waveform': torch.from_numpy(the_audio[None, :]),
+            'sample_rate': 16000
+        }
+        diarization_result = diarize_model(audio_data)
+        print("Speaker diarization has completed")
+        print("")
 
         # Step 6: Running conditional checks. The code to run will differ based on whether detected language is ENG or not.
 
         if whisper_detect_lang == "English": # Case 1: The audio file is in English. Only available option is to transcribe to english
+            print("Transcribing audio file")
+            print("")
             autodetect_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
             pure_eng_lang_final_result = display_timestamps_speaker_and_text(autodetect_whisper_result, diarization_result)
             pure_eng_csv_content = gen_group_speakers_csv_content(pure_eng_lang_final_result)
-            write_list_to_csv(pure_eng_csv_content, output_csv_path)
+            print("Finished transcribing audio file. Writing output as a CSV file to destination...")
+            print("")
+            write_list_to_csv(pure_eng_csv_content, output_csv_path, output_csv_headers)
+            print("CSV file has been created. Process is complete")
+            print("")
 
         elif translate_to_english: # Case 2: The audio file is in another language. Here, we want to translate text to english.
+            print("Translating audio file to English")
+            print("")
             eng_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
             eng_lang_final_result = display_timestamps_speaker_and_text(eng_whisper_result, diarization_result)
             eng_csv_content = gen_group_speakers_csv_content(eng_lang_final_result)
-            write_list_to_csv(eng_csv_content, output_csv_path)
+            print("Finished translating audio file to English. Writing output as a CSV file to destination...")
+            print("")
+            write_list_to_csv(eng_csv_content, output_csv_path, output_csv_headers)
+            print("CSV file has been created. Process is complete")
+            print("")
 
         else: # Case 2: The audio file is in another language. Here, we want to transcribe text based on the autodetected language
+            print("Transcribing audio file")
+            print("")
             eng_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
             eng_lang_final_result = display_timestamps_speaker_and_text(eng_whisper_result, diarization_result)
             eng_csv_content = gen_group_speakers_csv_content(eng_lang_final_result)
-            write_list_to_csv(eng_csv_content, output_csv_path)
+            print("Finished transcribing audio file. Writing output as a CSV file to destination...")
+            print("")
+            write_list_to_csv(eng_csv_content, output_csv_path, output_csv_headers)
+            print("CSV file has been created. Process is complete")
+            print("")
     else:
         print("Invalid file format. Please try again")
 
