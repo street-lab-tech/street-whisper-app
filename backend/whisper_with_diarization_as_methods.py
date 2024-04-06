@@ -296,7 +296,7 @@ def write_audio_text_obj_to_csv(csv_headers: List[str], csv_file_path: str, comb
 
             csv_writer.writerow(row_to_write)
 
-def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str) -> None:
+def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str, output_csv_headers: str) -> None:
     """
     This method writes a list of strings (which is the expected output from the method gen_group_speakers_csv_content
     into a CSV file with path defined by parameter output_csv_path
@@ -355,7 +355,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     else:
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]", "Text[Eng]"]
     the_date_time = str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":", "_").replace(".", "_")
-    output_csv_path = f'{destination_selection}/{the_date_time}_streetwhisperapp.csv' 
+    output_csv_path = destination_selection + "/" + the_date_time + "_" + "streetwhisperapp.csv"
     translate_to_english = to_english_selection # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
     # Step 2: Check if audio file is in valid format
@@ -385,19 +385,19 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             autodetect_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
             pure_eng_lang_final_result = display_timestamps_speaker_and_text(autodetect_whisper_result, diarization_result)
             pure_eng_csv_content = gen_group_speakers_csv_content(pure_eng_lang_final_result)
-            write_list_to_csv(pure_eng_csv_content, output_csv_path)
+            write_list_to_csv(pure_eng_csv_content, output_csv_path, output_csv_headers)
 
         elif translate_to_english: # Case 2: The audio file is in another language. Here, we want to translate text to english.
             eng_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
             eng_lang_final_result = display_timestamps_speaker_and_text(eng_whisper_result, diarization_result)
             eng_csv_content = gen_group_speakers_csv_content(eng_lang_final_result)
-            write_list_to_csv(eng_csv_content, output_csv_path)
+            write_list_to_csv(eng_csv_content, output_csv_path, output_csv_headers)
 
         else: # Case 2: The audio file is in another language. Here, we want to transcribe text based on the autodetected language
             eng_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
             eng_lang_final_result = display_timestamps_speaker_and_text(eng_whisper_result, diarization_result)
             eng_csv_content = gen_group_speakers_csv_content(eng_lang_final_result)
-            write_list_to_csv(eng_csv_content, output_csv_path)
+            write_list_to_csv(eng_csv_content, output_csv_path, output_csv_headers)
     else:
         print("Invalid file format. Please try again")
 
