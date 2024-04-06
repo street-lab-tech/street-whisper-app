@@ -1,4 +1,4 @@
-# Dependencies to install for application (Work in Progress)
+# Dependencies to install for application
 wheel
 typer[all]
 PyInquirer
