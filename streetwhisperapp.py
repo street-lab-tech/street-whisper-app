@@ -2,7 +2,8 @@ from backend import whisper_with_diarization_as_methods
 import typer
 from PyInquirer import prompt
 from rich import print as rprint
-import whisperx
+from pyannote.audio import Pipeline
+
 
 app = typer.Typer()
 
@@ -18,7 +19,7 @@ def authorization():
     potential_access_token = input()
     try:
         # Check token
-        diarize_model = whisperx.DiarizationPipeline(device="cpu", use_auth_token=potential_access_token)
+        diarize_model = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token=str(potential_access_token))
         questions_ui(diarize_model)
         typer.Exit()
     except:
@@ -42,7 +43,6 @@ def authorization():
             authorization()
         else:
             typer.Exit()
-
 
 def questions_ui(diarize_model):
     rprint("[magenta]=============================[magenta]")
