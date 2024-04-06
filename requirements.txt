@@ -4,7 +4,7 @@ typer[all]
 PyInquirer
 rich
 
-# Dependencies needed for whisper_with_diarization_as_methods.py (From StreetWhisperCode repo)
+# Dependencies needed for whisper_with_diarization_as_methods.py
 # Note: This version does BOTH transcription/translation and speaker diarization
 # Run manually in command line: pip install -q git+https://github.com/openai/whisper.git > /dev/null
 #Then, run the following:
