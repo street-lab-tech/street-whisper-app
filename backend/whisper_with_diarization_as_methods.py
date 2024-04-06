@@ -296,7 +296,7 @@ def write_audio_text_obj_to_csv(csv_headers: List[str], csv_file_path: str, comb
 
             csv_writer.writerow(row_to_write)
 
-def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str, output_csv_headers: str) -> None:
+def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str, output_csv_headers: List[str]) -> None:
     """
     This method writes a list of strings (which is the expected output from the method gen_group_speakers_csv_content
     into a CSV file with path defined by parameter output_csv_path
@@ -350,10 +350,12 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     output_csv_headers = [] # Insert your headers here by replacing values of empty strings. Eg: ["Timestamps", "Speaker No", "Text[Eng]"]
     if process_selected == "Transcription Only":
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"]
-    elif process_selected == "Translation Only":
-        output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
     else:
-        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]", "Text[Eng]"]
+        output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
+    #elif process_selected == "Translation Only":
+    #    output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
+    #else:
+    #    output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]", "Text[Eng]"]
     the_date_time = str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":", "_").replace(".", "_")
     output_csv_path = destination_selection + "/" + the_date_time + "_" + "streetwhisperapp.csv"
     translate_to_english = to_english_selection # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
