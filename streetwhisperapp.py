@@ -15,7 +15,7 @@ def startup_ui():
     authorization()
 
 def authorization():
-    rprint(f"What is your access token? An access token from Hugging Face and accepting pyannote/speaker-diarization-3.1's user condition is needed to run the app. If this is not your first time running the app, you can just press enter on your keyboard.[bold]")
+    rprint(f"What is your access token? An access token from Hugging Face and accepting pyannote/speaker-diarization-3.1's user condition is needed to run the app. If this is not your first time running the app amd have previously entered a valid token, you can just press enter on your keyboard.[bold]")
     potential_access_token = input()
     try:
         # Check token
