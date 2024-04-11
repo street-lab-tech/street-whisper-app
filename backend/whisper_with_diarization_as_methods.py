@@ -3,7 +3,7 @@ import whisper
 # import pandas as pd # Commented out import since the method importing it is not in current use
 import csv
 import time
-import datetime
+from datetime import datetime
 import magic
 from typing import Any, List, Optional
 from pyannote.audio import Pipeline
@@ -348,17 +348,20 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     # Step 1: Defining input audio path + defining CSV Headers
     input_audio_path = input_file # Insert audio file name and extension here (extensions can include: .mp3, .wav)
     output_csv_headers = [] # Insert your headers here by replacing values of empty strings. Eg: ["Timestamps", "Speaker No", "Text[Eng]"]
+    output_format = ""
     if process_selected == "Transcription Only":
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"]
+        output_format = "transcription"
     else:
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
-    #elif process_selected == "Translation Only":
-    #    output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
-    #else:
-    #    output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]", "Text[Eng]"]
-    the_date_time = str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":", "_").replace(".", "_")
-    output_csv_path = destination_selection + "/" + the_date_time + "_" + "streetwhisperapp.csv"
-    translate_to_english = to_english_selection # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
+        output_format = "translation"
+
+    #the_date_time = str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":", "_").replace(".", "_")
+    the_date_time = str(datetime.now().strftime("%H:%M"))
+    audio_path_last_backslash_index = input_file.rfind("/")
+    audio_name = input_file[audio_path_last_backslash_index + 1:]
+    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + the_date_time + "_" + ".csv"
+    translate_to_english = to_english_selection    # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
     # Step 2: Check if audio file is in valid format
     is_valid_audio_file = validate_audio_file(input_audio_path)
