@@ -1,6 +1,6 @@
 # STREET Whisper Transcription App
 
-## Structure
+## Structure of Repository 
 - ```backend```: A folder that contains all files related to the backend of the application such as scripts that does translation, transcription, etc. 
 - ```streetwhisperapp.py```: Script for the command line interface of the application.
 - ```requirements.txt```: All the dependencies that needs to be installed to run the app.
