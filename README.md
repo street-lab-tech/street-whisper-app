@@ -1,9 +1,9 @@
 # STREET Whisper Transcription App
 
 ## Structure
-```backend```: A folder that contains all files related to the backend of the application such as scripts that does translation, transcription, etc. 
-```streetwhisperapp.py```: Script for the command line interface of the application.
-```requirements.txt```: All the dependencies that needs to be installed to run the app.
+- ```backend```: A folder that contains all files related to the backend of the application such as scripts that does translation, transcription, etc. 
+- ```streetwhisperapp.py```: Script for the command line interface of the application.
+- ```requirements.txt```: All the dependencies that needs to be installed to run the app.
 
 ## How To Run App
 This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 installed on your device. You can install Python 3.9 from here: https://www.python.org/downloads/. 
