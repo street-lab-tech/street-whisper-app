@@ -16,8 +16,8 @@ This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 instal
         - Example: Say the ```street-whisper-app``` folder is located in your GitHub folder, which is in your documents folder on your computer, this would be the order of commands you will enter (Note: you enter after writing every command): ```cd documents -> cd GitHub -> cd street-whisper-app```.
     2. In the ```street-whisper-app``` folder, if this is your first time running the app we want to create a virtual environment, which is a seperate and isolated place from has all the dependencies we need to run the app. To create the virtual environment (assuming Python 3.9 has been install), run the following command with <virtual-environment-name> replaced with the name of your choosing (ex: ```python3.9 -m venv myvenv```): ```python3.9 -m venv <virtual-environment-name>```. To activate the virtual environment, use the following command: ```source <virtual-environment-name>/bin/activate```. In other times when you run the app, you do not need to create a new virtual environment again and you can use ```source <virtual-environment-name>/bin/activate``` to activate the virtual environment. 
     5. From there enter the following command: ```python streetwhisperapp.py start``` to start the app.
-    6. When you run the app, if this is your first time running the app on your device, enter the access token from Hugging Face. If you have entered a valid token in the past, you can just click enter when the app ask for an access token.
+    6. If this is your first time running the app on your device, enter the access token from Hugging Face when prompted by the app. If you have entered a valid token in the past, you can just click enter when the app ask for an access token.
 
-Note: The app can be ran offline after a valid access token has been entered. 
+Note: The app can run offline after a valid access token has been entered. 
 
 Link to the original repository containing the original scripts for the models: https://github.com/carmen-chau/StreetWhisperCode
