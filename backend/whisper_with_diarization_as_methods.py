@@ -21,11 +21,12 @@ def validate_audio_file(audio_file_path: str) -> bool:
         - Audio file inputs are either .wav or .mp3. Whisper can process more audio file inputs, but the checking for
         other "types" of files has not been implemented yet
     """
-    validate_audio_path_msg = magic.from_file(audio_file_path)
-    if "WAVE audio" in validate_audio_path_msg or "Audio file" in validate_audio_path_msg: # TODO: 1st cond => .wav file. 2nd cond => .mp3 files
-        return True
-    else:
-        return False
+    validate_audio_path_msg = magic.from_file(audio_file_path, mime=True)
+    supported_file_extensions = {"mpeg", "mp4", "wav"} #mpeg include checks for mp3, mp4 includes checks for .mp4 and .m4a
+    for file_ext in supported_file_extensions:
+        if file_ext in validate_audio_path_msg:
+            return True
+    return False
 
 def define_whisper_model(model_path: str):
     """
@@ -372,9 +373,6 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         print("")
         print(f'Detected language in input audio file: {whisper_detect_lang}')
         print("")
-        # Step 5: Conducting speaker diarization on the file (this step is the same for both transcription and translation)
-        # TODO: Using a possible check (using an intermediate variable denoting whether or not diarization is complete...
-        # TODO (CONT): ... + using the https://pypi.org/project/progress/ library, can add a spinner to denote diarization running
         print("Speaker diarization has started, in progress")
         print("")
         diarize_model = diarize_model
