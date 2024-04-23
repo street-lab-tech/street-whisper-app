@@ -347,16 +347,14 @@ def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str, outp
 def main(process_selected: str, input_file: str, to_english_selection: bool, model_size_selection: str, destination_selection: str, diarize_model):
     # Step 1: Defining input audio path + defining CSV Headers
     input_audio_path = input_file # Insert audio file name and extension here (extensions can include: .mp3, .wav)
-    output_csv_headers = [] # Insert your headers here by replacing values of empty strings. Eg: ["Timestamps", "Speaker No", "Text[Eng]"]
-    output_format = ""
+
     if process_selected == "Transcription Only":
-        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"]
+        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"] # Insert your headers here by replacing values of empty strings. Eg: ["Timestamps", "Speaker No", "Text[Eng]"]
         output_format = "transcription"
     else:
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
         output_format = "translation"
 
-    #the_date_time = str(datetime.datetime.now()).replace("-", "_").replace(" ", "_").replace(":", "_").replace(".", "_")
     the_date_time = str(datetime.now().strftime("%H:%M"))
     audio_path_last_backslash_index = input_file.rfind("/")
     audio_name = input_file[audio_path_last_backslash_index + 1:]
@@ -368,7 +366,6 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     if (is_valid_audio_file):
         # Step 3: Defining whisper model
         loaded_whisper_model = define_whisper_model(model_size_selection)
-        # loaded_whisper_model = define_whisper_model(f'whisper_models/{model_size_selection}.pt')  # Insert .pt model to replace the "xxxx.pt" placeholder text
 
         # Step 4: Processing and printing out detected language
         whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path)
