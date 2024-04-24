@@ -356,10 +356,12 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
         output_format = "translation"
 
-    the_date_time = str(datetime.now().strftime("%H:%M"))
+    now = datetime.now()
     audio_path_last_backslash_index = input_file.rfind("/")
     audio_name = input_file[audio_path_last_backslash_index + 1:]
-    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + the_date_time + "_" + ".csv"
+    #output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + the_date_time + "_" + ".csv"
+    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + str(now.minute) + ".csv" #TODO: Bug with: "THIS TOKEN IS INVALID"
+    print(output_csv_path)
     translate_to_english = to_english_selection    # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
     # Step 2: Check if audio file is in valid format
