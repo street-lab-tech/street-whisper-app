@@ -357,7 +357,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         output_format = "translation"
     else: # reaching here means: process_selected == 'Transcription + Translation Only'
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]", "Text[Eng]"]
-        output_format = "translate_+_transcribe"
+        output_format = "transcribe&translate"
 
     now = datetime.now()
     audio_path_last_backslash_index = input_file.rfind("/")
@@ -390,29 +390,46 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
 
         # Step 6: Running conditional checks. The code to run will differ based on whether detected language is ENG or not.
         # TODO: Look into whether the print("") could be replaced with a built-in newline character in the prior print statement (to reduce print calls)
-        if process_selected == "Transcription Only":
+        if (process_selected == "Transcription Only"):
             print("Transcribing audio file\n")
             #print("")
-            transcription_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
-            transcription_final_result = display_timestamps_speaker_and_text(transcription_whisper_result,
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                              diarization_result)
-            pure_eng_csv_content = gen_group_speakers_csv_content(transcription_final_result)
+            transcript_csv_content = gen_group_speakers_csv_content(transcript_final_result)
             print("Finished transcribing audio file. Writing output as a CSV file to destination...\n")
             #print("")
-            write_list_to_csv(pure_eng_csv_content, output_csv_path, output_csv_headers)
+            write_list_to_csv(transcript_csv_content, output_csv_path, output_csv_headers)
             print("CSV file has been created. Process is complete\n")
             #print("")
 
-        elif process_selected == "Translation Only":
+        elif (process_selected == "Translation Only") or (translate_to_english == "Yes"):
             print("Translating audio file to English\n")
             #print("")
-            eng_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
-            eng_lang_final_result = display_timestamps_speaker_and_text(eng_whisper_result, diarization_result)
-            eng_csv_content = gen_group_speakers_csv_content(eng_lang_final_result)
+            trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
+            trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
+            trans_csv_content = gen_group_speakers_csv_content(trans_lang_final_result)
             print("Finished translating audio file to English. Writing output as a CSV file to destination...\n")
             #print("")
-            write_list_to_csv(eng_csv_content, output_csv_path, output_csv_headers)
+            write_list_to_csv(trans_csv_content, output_csv_path, output_csv_headers)
             print("CSV file has been created. Process is complete\n")
             #print("")
+
+        else: #If reached here, then process_selected == "translate_+_transcribe"
+            print("Transcribing audio file\n")
+
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
+                                                                          diarization_result)
+            transcript_csv_content = gen_group_speakers_csv_content(transcript_final_result)
+            print("Done transcription\n")
+
+            print("Now, translating audio file to English\n")
+            trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
+            trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
+            trans_csv_content = gen_group_speakers_csv_content(trans_lang_final_result)
+            print("Done translation\n")
+
+
     else:
         print("Invalid file format. Please try again")
