@@ -363,7 +363,6 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     audio_path_last_backslash_index = input_file.rfind("/")
     audio_name = input_file[audio_path_last_backslash_index + 1:]
     output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + str(now.minute) + ".csv" #TODO: There is a bug where inserting a ":" in between the hours and minutes causes an extra '\' to appear
-    print(output_csv_path)
     translate_to_english = to_english_selection    # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
     # Step 2: Check if audio file is in valid format
