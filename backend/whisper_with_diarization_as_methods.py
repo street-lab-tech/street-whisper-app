@@ -156,7 +156,7 @@ def display_timestamps_speaker_and_text(whisper_result, speaker_diaz_result):
 #             autodetect_csv_content[i].append(eng_csv_content[i][-1])
 #             comb_lang_csv_writer.writerow(autodetect_csv_content[i])
 
-def translate_or_transcribe_only_csv(comb_result) -> List:
+def translate_or_transcribe_only_csv(comb_result_1, comb_result_2) -> List:
     """
     NOTE: This function is ONLY used to write content to TRANSCRIPTION / TRANSLATION ONLY
     files.
@@ -183,29 +183,29 @@ def translate_or_transcribe_only_csv(comb_result) -> List:
     00:00:40 - 00:00:50 | Speaker 1 | "A cat?"
     00:00:50 - 00:00:55 | Speaker 0 | "Yes."
     """
-    curr_speaker = comb_result[0][1]  # Denotes the speaker that is currently "speaking" in the iteration
-    initial_seg = comb_result[0][0]
+    curr_speaker = comb_result_1[0][1]  # Denotes the speaker that is currently "speaking" in the iteration
+    initial_seg = comb_result_1[0][0]
     start_timestamp_as_time_obj = time.gmtime(float(initial_seg.start))
     beg_speaker_timestamp = time.strftime("%H:%M:%S", start_timestamp_as_time_obj)
 
     end_timestamp_as_time_obj = time.gmtime(float(initial_seg.end))
     end_speaker_timestamp = time.strftime("%H:%M:%S", end_timestamp_as_time_obj)
 
-    speaker_text_seg = comb_result[0][2]
+    speaker_text_seg = comb_result_1[0][2]
 
     csv_content = []
 
-    for i in range(1, len(comb_result)):
-        seg = comb_result[i][0]
-        speaker = comb_result[i][1]  # Denotes the speaker that is currently "speaking" in the iteration
+    for i in range(1, len(comb_result_1)): #TODO might need to modify this check based on whether comb_result_2 exists
+        seg = comb_result_1[i][0]
+        speaker = comb_result_1[i][1]  # Denotes the speaker that is currently "speaking" in the iteration
 
-        if (speaker == curr_speaker) and i < len(comb_result) - 1:
-            speaker_text_seg = speaker_text_seg + comb_result[i][2]
+        if (speaker == curr_speaker) and i < len(comb_result_1) - 1:
+            speaker_text_seg = speaker_text_seg + comb_result_1[i][2]
             end_timestamp_as_time_obj = time.gmtime(float(seg.end))
             end_speaker_timestamp = time.strftime("%H:%M:%S", end_timestamp_as_time_obj)
 
-        elif (speaker == curr_speaker) and i == len(comb_result) - 1:
-            speaker_text_seg = speaker_text_seg + comb_result[i][2]
+        elif (speaker == curr_speaker) and i == len(comb_result_1) - 1:
+            speaker_text_seg = speaker_text_seg + comb_result_1[i][2]
             end_timestamp_as_time_obj = time.gmtime(float(seg.end))
             end_speaker_timestamp = time.strftime("%H:%M:%S", end_timestamp_as_time_obj)
             # In addition to the above, since we reached the end of the iteration, need to write to csv file
@@ -250,9 +250,9 @@ def translate_or_transcribe_only_csv(comb_result) -> List:
             end_speaker_timestamp = time.strftime("%H:%M:%S", end_timestamp_as_time_obj)
 
             # step 9: change value of speaker_text_seg to be the text seg corresponding to the speaker at this current time
-            speaker_text_seg = comb_result[i][2]
+            speaker_text_seg = comb_result_1[i][2]
 
-            if i == len(comb_result) - 1:
+            if i == len(comb_result_1) - 1:
                 row_to_write = []
                 full_timestamp = beg_speaker_timestamp + "-" + end_speaker_timestamp
                 row_to_write.append(full_timestamp)
@@ -260,7 +260,6 @@ def translate_or_transcribe_only_csv(comb_result) -> List:
                 row_to_write.append(speaker_text_seg)
                 csv_content.append(row_to_write)
     return csv_content
-
 
 def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str, output_csv_headers: List[str]) -> None:
     """
