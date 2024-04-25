@@ -28,7 +28,7 @@ def validate_audio_file(audio_file_path: str) -> bool:
             return True
     return False
 
-def define_whisper_model(model_path: str):
+def define_whisper_model(model_path: str, is_english: bool):
     """
     This method downloads a Whisper model by loading in a .pt file in the directory
     specified by parameter model_path
@@ -49,7 +49,15 @@ def define_whisper_model(model_path: str):
     """
     # TODO: Need to handle cases where invalid model path is passed, need to add conditional checks for that
     # TODO #2: Need to determine what is the return type of the model?
-    whisper_model = whisper.load_model(model_path)
+    if (is_english == "Yes" and model_path == "small"):
+        whisper_model = whisper.load_model("small.en")
+        print("chosen small.en")
+    elif (is_english == "Yes" and model_path == "medium"):
+        whisper_model = whisper.load_model("medium.en")
+        print("chosen medium.en")
+    else:
+        whisper_model = whisper.load_model(model_path)
+        print("chosen: " + model_path)
     return whisper_model
 
 def detecting_language(whisper_model: Any, audio_file_path: str) -> str:
@@ -331,11 +339,14 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     is_valid_audio_file = validate_audio_file(input_audio_path)
     if (is_valid_audio_file):
         # Step 3: Defining whisper model
-        loaded_whisper_model = define_whisper_model(model_size_selection)
+        loaded_whisper_model = define_whisper_model(model_size_selection, translate_to_english)
 
         # Step 4: Processing and printing out detected language
-        whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path)
-        print(f'Detected language in input audio file: {whisper_detect_lang}\n')
+        if (translate_to_english == "Yes"):
+            print("Detected language in input audio file: English\n")
+        else:
+            whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path)
+            print(f'Detected language in input audio file: {whisper_detect_lang}\n')
 
         print("Speaker diarization has started, in progress\n")
         diarize_model = diarize_model
@@ -368,21 +379,22 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             print("CSV file has been created. Process is complete\n")
 
         else: #If reached here, then process_selected == "translate_+_transcribe"
-            print("Transcribing audio file\n")
-
-            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
-            transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
-                                                                          diarization_result)
-            transcript_csv_content = gen_group_speakers_csv_content(transcript_final_result)
-            print("Done transcription\n")
-
-            print("Now, translating audio file to English\n")
-            trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
-            trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
-            trans_csv_content = gen_group_speakers_csv_content(trans_lang_final_result)
-            print("Done translation\n")
-
-            print("Finished both transcription and translation. Writing output as a CSV file to destination...\n")
+            # TODO: Nothing in this part is finalized yet, temporairly commented out
+            # print("Transcribing audio file\n")
+            #
+            # transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            # transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
+            #                                                               diarization_result)
+            # transcript_csv_content = gen_group_speakers_csv_content(transcript_final_result)
+            # print("Done transcription\n")
+            #
+            # print("Now, translating audio file to English\n")
+            # trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
+            # trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
+            # trans_csv_content = gen_group_speakers_csv_content(trans_lang_final_result)
+            # print("Done translation\n")
+            #
+            # print("Finished both transcription and translation. Writing output as a CSV file to destination...\n")
 
 
     else:
