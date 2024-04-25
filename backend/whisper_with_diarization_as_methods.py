@@ -261,43 +261,6 @@ def translate_or_transcribe_only_csv(comb_result) -> List:
                 csv_content.append(row_to_write)
     return csv_content
 
-def write_audio_text_obj_to_csv(csv_headers: List[str], csv_file_path: str, comb_result):
-    """
-    Default settings for writing an audio text obj (the return object from method display_timestamps_speaker_and_text)
-    to CSV without grouping/clubbing by speakers
-
-    A CSV with the following format would be returned:
-
-    Column 1: Timestamps (in HH:MM:SS) format (hour, minute, second)
-    Column 2: Speaker No (String denoting the identification of speakers)
-    Column 3: Column is named Text[Orig Lang] if the comb_result contains text
-    based on Whisper's autodetected language. Otherwise, it is named Text[Eng]
-
-    Preconditions:
-        - csv_headers contains only the column names listed above
-    """
-    with open(csv_file_path, "w") as csv_file:
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(csv_headers)  # Write the header row
-        for i in range(len(comb_result)):
-            row_to_write = []
-            seg = comb_result[i][0]
-            start_timestamp_as_time_obj = time.gmtime(float(seg.start))
-            converted_start_timestamp = time.strftime("%H:%M:%S",start_timestamp_as_time_obj)
-
-            end_timestamp_as_time_obj = time.gmtime(float(seg.end))
-            converted_end_timestamp = time.strftime("%H:%M:%S", end_timestamp_as_time_obj)
-
-            full_timestamp = converted_start_timestamp + "-" + converted_end_timestamp
-            row_to_write.append(full_timestamp)
-
-            speaker = comb_result[i][1]
-            row_to_write.append(speaker)
-
-            speaker_text = comb_result[i][2]
-            row_to_write.append(speaker_text)
-
-            csv_writer.writerow(row_to_write)
 
 def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str, output_csv_headers: List[str]) -> None:
     """
