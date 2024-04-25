@@ -156,8 +156,10 @@ def display_timestamps_speaker_and_text(whisper_result, speaker_diaz_result):
 #             autodetect_csv_content[i].append(eng_csv_content[i][-1])
 #             comb_lang_csv_writer.writerow(autodetect_csv_content[i])
 
-def gen_group_speakers_csv_content(comb_result) -> List:
+def translate_or_transcribe_only_csv(comb_result) -> List:
     """
+    NOTE: This function is ONLY used to write content to TRANSCRIPTION / TRANSLATION ONLY
+    files.
     This method returns a List that contain the parsed information
     from object comb_result. This information is intended to be written into a CSV file
     where the speakers are GROUPED TOGETHER / CLUBBED TOGETHER.
@@ -391,7 +393,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                              diarization_result)
-            transcript_csv_content = gen_group_speakers_csv_content(transcript_final_result)
+            transcript_csv_content = translate_or_transcribe_only_csv(transcript_final_result)
             print("Finished transcribing audio file. Writing output as a CSV file to destination...\n")
             write_list_to_csv(transcript_csv_content, output_csv_path, output_csv_headers)
             print("CSV file has been created. Process is complete\n")
@@ -400,7 +402,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             print("Translating audio file to English\n")
             trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
             trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
-            trans_csv_content = gen_group_speakers_csv_content(trans_lang_final_result)
+            trans_csv_content = translate_or_transcribe_only_csv(trans_lang_final_result)
             print("Finished translating audio file to English. Writing output as a CSV file to destination...\n")
             write_list_to_csv(trans_csv_content, output_csv_path, output_csv_headers)
             print("CSV file has been created. Process is complete\n")
@@ -411,13 +413,13 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                           diarization_result)
-            transcript_csv_content = gen_group_speakers_csv_content(transcript_final_result)
+            transcript_csv_content = translate_or_transcribe_only_csv(transcript_final_result)
             print("Done transcription\n")
 
             print("Now, translating audio file to English\n")
             trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
             trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
-            trans_csv_content = gen_group_speakers_csv_content(trans_lang_final_result)
+            trans_csv_content = translate_or_transcribe_only_csv(trans_lang_final_result)
             print("Done translation\n")
 
             print("Finished both transcription and translation. Writing output as a CSV file to destination...\n")
