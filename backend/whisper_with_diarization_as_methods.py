@@ -358,7 +358,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             write_list_to_csv(transcript_csv_content, output_csv_path, output_csv_headers)
             print("CSV file has been created. Process is complete\n")
 
-        elif (process_selected == "Translation Only"):
+        elif (process_selected == "Translation Only" or translate_to_english == "Yes"):
             print("Translating audio file to English\n")
             trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
             trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
