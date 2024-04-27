@@ -368,24 +368,25 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             print("CSV file has been created. Process is complete\n")
 
         else: #If reached here, then process_selected == "translate_+_transcribe"
-            print("TODO")
-            # TODO: Nothing in this part is finalized yet, temporairly commented out
-            # print("Transcribing audio file\n")
-            #
-            # transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
-            # transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
-            #                                                               diarization_result)
-            # transcript_csv_content = gen_group_speakers_csv_content(transcript_final_result)
-            # print("Done transcription\n")
-            #
-            # print("Now, translating audio file to English\n")
-            # trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
-            # trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
-            # trans_csv_content = gen_group_speakers_csv_content(trans_lang_final_result)
-            # print("Done translation\n")
-            #
-            # print("Finished both transcription and translation. Writing output as a CSV file to destination...\n")
+            print("Transcribing audio file\n")
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
+                                                                          diarization_result)
+            transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
+            print("Done transcription\n")
 
+            print("Now, translating audio file to English\n")
+            trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
+            trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
+            trans_csv_content = writing_solo_res_to_csv(trans_lang_final_result)
+            print("Done translation\n")
+
+            print("Combining transcription and translation results")
+            combo_csv_content = writing_comb_res_to_csv(transcript_csv_content,trans_csv_content)
+
+            print("Finished both transcription and translation. Writing output as a CSV file to destination...\n")
+            write_list_to_csv(combo_csv_content, output_csv_path, output_csv_headers)
+            print("CSV file has been created. Process is complete\n")
 
     else:
         print("Invalid file format. Please try again")
