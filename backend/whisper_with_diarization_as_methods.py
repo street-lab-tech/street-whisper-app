@@ -22,7 +22,8 @@ def validate_audio_file(audio_file_path: str) -> bool:
         other "types" of files has not been implemented yet
     """
     validate_audio_path_msg = magic.from_file(audio_file_path, mime=True)
-    supported_file_extensions = {"mpeg", "mp4", "wav"} #mpeg include checks for mp3, mp4 includes checks for .mp4 and .m4a
+    supported_file_extensions = {"mpeg", "mp4", "wav", "webm"}
+    #Note: In above line, mpeg include checks for mpeg, mp3 and mpga. mp4 includes checks for .mp4 and .m4a
     for file_ext in supported_file_extensions:
         if file_ext in validate_audio_path_msg:
             return True
