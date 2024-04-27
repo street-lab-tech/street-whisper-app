@@ -260,7 +260,6 @@ def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
     else:
         length_limit = result_1_len
         res_with_min_length = 1
-    print("Length limit: ", length_limit)
 
     # Step 2: Create a list of list object starting from length 0 up to the length_limit
     comb_csv_content = []
