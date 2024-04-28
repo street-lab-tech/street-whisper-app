@@ -22,6 +22,8 @@ def authorization():
         diarize_model = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token=str(potential_access_token))
         questions_ui(diarize_model)
         typer.Exit()
+    except KeyboardInterrupt:
+        typer.Exit()
     except:
         invalidTokenPrompt = [
             {
