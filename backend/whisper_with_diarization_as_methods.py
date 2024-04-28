@@ -5,7 +5,6 @@ import csv
 import time
 from datetime import datetime
 import magic
-from typing import Any, List, Optional
 from pyannote.audio import Pipeline
 from backend.merge_timestamps import diarize_text
 from iso639 import Lang
@@ -22,8 +21,10 @@ def validate_audio_file(audio_file_path: str) -> bool:
         other "types" of files has not been implemented yet
     """
     validate_audio_path_msg = magic.from_file(audio_file_path, mime=True)
-    supported_file_extensions = {"mpeg", "mp4", "wav", "webm", "flac", "ogg"}
+    print(validate_audio_path_msg)
+    supported_file_extensions = {"mpeg", "mp4", "wav", "webm", "flac", "ogg", "adts"}
     #Note: In above line, mpeg include checks for mpeg, mp3 and mpga. mp4 includes checks for .mp4 and .m4a
+    # adts files can include some audio files disguised as mp3/mp4
     for file_ext in supported_file_extensions:
         if file_ext in validate_audio_path_msg:
             return True
@@ -53,7 +54,7 @@ def define_whisper_model(model_path: str):
     whisper_model = whisper.load_model(model_path)
     return whisper_model
 
-def detecting_language(whisper_model: Any, audio_file_path: str) -> str:
+def detecting_language(whisper_model, audio_file_path: str) -> str:
     """
     This method takes in a Whisper Model instances, and an audio file with the path as specified by parameter
     audio_file_path.
@@ -77,7 +78,7 @@ def detecting_language(whisper_model: Any, audio_file_path: str) -> str:
     full_language = Lang(detected_lang_code).name # decoding the language code
     return full_language
 
-def transcribe_audio(whisper_model: Any, audio_file_path: str, is_translate: Optional[bool] = False):
+def transcribe_audio(whisper_model, audio_file_path: str, is_translate):
     """
     This method takes an audio file with the path as specified by parameter audio_file_path.
     It also takes a boolean is_translate. If true, we wish to translate the transcribed text to English.
@@ -131,7 +132,7 @@ def display_timestamps_speaker_and_text(whisper_result, speaker_diaz_result):
     """
     return diarize_text(whisper_result, speaker_diaz_result)
 
-def writing_solo_res(comb_result) -> List:
+def writing_solo_res(comb_result):
     """
     This method returns a List that contain the parsed information
     from object comb_result. This information is intended to be written into a CSV file
@@ -234,7 +235,7 @@ def writing_solo_res(comb_result) -> List:
                 csv_content.append(row_to_write)
     return csv_content
 
-def write_audio_text_obj_to_csv(csv_headers: List[str], csv_file_path: str, comb_result):
+def write_audio_text_obj_to_csv(csv_headers, csv_file_path: str, comb_result):
     """
     Default settings for writing an audio text obj (the return object from method display_timestamps_speaker_and_text)
     to CSV without grouping/clubbing by speakers
@@ -272,7 +273,7 @@ def write_audio_text_obj_to_csv(csv_headers: List[str], csv_file_path: str, comb
 
             csv_writer.writerow(row_to_write)
 
-def write_list_to_csv(list_of_csv_content: List[str], output_csv_path: str, output_csv_headers: List[str]) -> None:
+def write_list_to_csv(list_of_csv_content, output_csv_path: str, output_csv_headers) -> None:
     """
     This method writes a list of strings (which is the expected output from the method gen_group_speakers_csv_content
     into a CSV file with path defined by parameter output_csv_path
@@ -300,7 +301,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     audio_path_last_backslash_index = input_file.rfind("/")
     audio_name = input_file[audio_path_last_backslash_index + 1:]
     #output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + the_date_time + "_" + ".csv"
-    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + str(now.minute) + ".csv" #TODO: Bug with: "THIS TOKEN IS INVALID"
+    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + "_" + str(now.minute) + ".csv" #TODO: Bug with: "THIS TOKEN IS INVALID"
     # print(output_csv_path)
     translate_to_english = to_english_selection    # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
@@ -331,7 +332,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
 
         if (process_selected == "Transcription Only"):
             print("Transcribing audio file\n")
-            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, None)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                           diarization_result)
             transcript_csv_content = writing_solo_res(transcript_final_result)
