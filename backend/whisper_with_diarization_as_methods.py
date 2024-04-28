@@ -1,6 +1,5 @@
 ## Import statements ##
 import whisper
-# import pandas as pd # Commented out import since the method importing it is not in current use
 import csv
 import time
 from datetime import datetime
