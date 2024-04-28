@@ -359,12 +359,18 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     now = datetime.now()
     audio_path_last_backslash_index = input_file.rfind("/")
     audio_name = input_file[audio_path_last_backslash_index + 1:]
+    # Remove leading and trailing whitespace
+    audio_name = audio_name.strip()
+    # Replace any "  " which both represent a space in audio file with _
+    audio_name = audio_name.replace(" ", "_")
     #output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + the_date_time + "_" + ".csv"
     output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + str(now.minute) + ".csv" #TODO: Bug with: "THIS TOKEN IS INVALID"
     print(output_csv_path)
     translate_to_english = to_english_selection    # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
     # Step 2: Check if audio file is in valid format
+    # Remove leading and trailing whitespace from input audio path
+    input_audio_path = input_audio_path.strip()
     is_valid_audio_file = validate_audio_file(input_audio_path)
     if (is_valid_audio_file):
         # Step 3: Defining whisper model
@@ -425,4 +431,4 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             print("CSV file has been created. Process is complete")
             print("")
     else:
-        print("Invalid file format. Please try again")
+        print("Invalid file format or input file could not be found. Please try again")
