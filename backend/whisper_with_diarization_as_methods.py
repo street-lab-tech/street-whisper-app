@@ -363,24 +363,21 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
 
     # Remove leading and trailing whitespace from audio_name
     audio_name = audio_name.strip()
-    print("Audio name after stripping: ", audio_name)
     # Replace any "  " which both represent a space in audio file with _
     audio_name = "_".join(audio_name.split())
-    print("Audio name after replacing spaces: ", audio_name)
     # Remove leading and trailing whitespace from destination_selection
     destination_selection = destination_selection.strip()
 
     # Constructing output csv path string
-    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + "_" + str(now.hour) + str(now.minute) + ".csv"
-    print("Output csv path: ", output_csv_path)
+    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + "_" + str(now.hour) + "_" + str(now.minute) + ".csv"
+    print("For reference, this is the output path: ", output_csv_path)
     translate_to_english = to_english_selection # True denotes that file is in ENG. Only transcription is needed
 
     # Step 2: Check if audio file is in valid format
     # Remove leading and trailing whitespace from input audio path
-    input_audio_path = (input_audio_path.strip())[0:audio_path_last_backslash_index + 1] + audio_name
-    print("Input audio path: ", input_audio_path)
+    input_audio_path = input_audio_path.strip()
+    input_audio_path = (input_audio_path.strip())[0: input_audio_path.rfind("/") + 1] + audio_name
     is_valid_audio_file = validate_audio_file(input_audio_path)
-    print("Made it past input audio path check")
 
     if (is_valid_audio_file):
         # Step 3: Defining whisper model
