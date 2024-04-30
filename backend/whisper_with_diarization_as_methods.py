@@ -314,7 +314,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         output_format = "translation"
     else: # reaching here means: process_selected == 'Transcription + Translation Only'
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]", "Text[Eng]"]
-        output_format = "transcribe_translate"
+        output_format = "transcribe&translate"
 
     now = datetime.now()
     audio_path_last_backslash_index = input_file.rfind("/")
