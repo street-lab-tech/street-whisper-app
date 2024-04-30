@@ -300,17 +300,18 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     audio_name = input_file[audio_path_last_backslash_index + 1:]
     #output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + the_date_time + "_" + ".csv"
     output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + "_" + str(now.minute) + ".csv" #TODO: Bug with: "THIS TOKEN IS INVALID"
-    # print(output_csv_path)
     translate_to_english = to_english_selection    # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
     # Step 2: Check if audio file is in valid format
     is_valid_audio_file = validate_audio_file(input_audio_path)
     if (is_valid_audio_file):
+        print("Made it past audio file check")
         # Step 3: Defining whisper model
         loaded_whisper_model = define_whisper_model(model_size_selection)
-
+        print("Made it past loading whisper model")
         # Step 4: Processing and printing out detected language
         whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path)
+        print("Made it past detecting language")
         print("")
         print(f'Detected language in input audio file: {whisper_detect_lang}')
         print("")
@@ -337,6 +338,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             print("Finished transcribing audio file. Writing output as a CSV file to destination...\n")
             write_list_to_csv(transcript_csv_content, output_csv_path, output_csv_headers)
             print("CSV file has been created. Process is complete\n")
+            return
 
         elif (process_selected == "Translation Only" or translate_to_english == "Yes"):
             print("Translating audio file to English\n")
@@ -346,6 +348,8 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             print("Finished translating audio file to English. Writing output as a CSV file to destination...\n")
             write_list_to_csv(trans_csv_content, output_csv_path, output_csv_headers)
             print("CSV file has been created. Process is complete\n")
+            return
         # TODO: Temporarily removed the conditional for the dual transcription + translation process
     else:
         print("Invalid file format. Please try again")
+        return
