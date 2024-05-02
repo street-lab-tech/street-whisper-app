@@ -60,6 +60,9 @@ def questions_ui(diarize_model):
                 },
                 {
                     'name': 'Translation Only',
+                },
+                {
+                    'name': 'Transcription + Translation Only',
                 }
             ],
         }
