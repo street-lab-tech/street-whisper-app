@@ -1,4 +1,5 @@
 # STREET Whisper Transcription App
+Link to the repository containing the original scripts used for the backend: https://github.com/carmen-chau/StreetWhisperCode
 
 ## Structure of Repository 
 - ```backend```: A folder that contains all files related to the backend of the application such as scripts that does translation, transcription, etc. 
@@ -19,6 +20,4 @@ This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 instal
     6. From there enter the following command: ```python streetwhisperapp.py start``` to start the app.
     7. If this is your first time running the app on your device, enter the access token from Hugging Face when prompted by the app. If you have entered a valid token in the past, you can just click enter when the app ask for an access token.
 
-Note: The app can run offline after a valid access token has been entered. 
-
-Link to the original repository containing the original scripts for the models: https://github.com/carmen-chau/StreetWhisperCode
+Note: The app can run offline after a valid access token has been entered.
