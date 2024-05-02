@@ -4,11 +4,11 @@ import csv
 import time
 from datetime import datetime
 import magic
+from typing import Any, List, Optional
 from pyannote.audio import Pipeline
 from backend.merge_timestamps import diarize_text
 from iso639 import Lang
 import torch
-
 
 def validate_audio_file(audio_file_path: str) -> bool:
     """
@@ -28,7 +28,7 @@ def validate_audio_file(audio_file_path: str) -> bool:
             return True
     return False
 
-def define_whisper_model(model_path: str):
+def define_whisper_model(model_path: str, is_english: bool):
     """
     This method downloads a Whisper model by loading in a .pt file in the directory
     specified by parameter model_path
@@ -47,9 +47,12 @@ def define_whisper_model(model_path: str):
     :param model_path: Local path of the Whisper model
     :return: A Whisper Model Object
     """
-    # TODO: Need to handle cases where invalid model path is passed, need to add conditional checks for that
-    # TODO #2: Need to determine what is the return type of the model?
-    whisper_model = whisper.load_model(model_path)
+    if (is_english == "Yes" and model_path == "small"):
+        whisper_model = whisper.load_model("small.en")
+    elif (is_english == "Yes" and model_path == "medium"):
+        whisper_model = whisper.load_model("medium.en")
+    else:
+        whisper_model = whisper.load_model(model_path)
     return whisper_model
 
 def detecting_language(whisper_model, audio_file_path: str) -> str:
@@ -130,8 +133,11 @@ def display_timestamps_speaker_and_text(whisper_result, speaker_diaz_result):
     """
     return diarize_text(whisper_result, speaker_diaz_result)
 
-def writing_solo_res(comb_result):
+def writing_solo_res_to_csv(comb_result) -> List:
     """
+    NOTE: This method is a helper method for CSV writing in the case when
+    user selects "Transcription only" or "Translation only".
+
     This method returns a List that contain the parsed information
     from object comb_result. This information is intended to be written into a CSV file
     where the speakers are GROUPED TOGETHER / CLUBBED TOGETHER.
@@ -232,48 +238,60 @@ def writing_solo_res(comb_result):
                 row_to_write.append(speaker_text_seg)
                 csv_content.append(row_to_write)
     return csv_content
-
-def write_audio_text_obj_to_csv(csv_headers, csv_file_path: str, comb_result):
+def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
     """
-    Default settings for writing an audio text obj (the return object from method display_timestamps_speaker_and_text)
-    to CSV without grouping/clubbing by speakers
+    NOTE: This method is a helper method for CSV writing in the case when
+    user selects "Transcription + Translation".
 
-    A CSV with the following format would be returned:
-
-    Column 1: Timestamps (in HH:MM:SS) format (hour, minute, second)
-    Column 2: Speaker No (String denoting the identification of speakers)
-    Column 3: Column is named Text[Orig Lang] if the comb_result contains text
-    based on Whisper's autodetected language. Otherwise, it is named Text[Eng]
-
-    Preconditions:
-        - csv_headers contains only the column names listed above
+    This method takes the completed diaritized transcription list result (comb_list_1) and
+    the completed diaritized translation list result (comb_list_2) and creates a list that
+    combines results from both in preparation for CSV writing.
     """
-    with open(csv_file_path, "w") as csv_file:
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(csv_headers)  # Write the header row
-        for i in range(len(comb_result)):
-            row_to_write = []
-            seg = comb_result[i][0]
-            start_timestamp_as_time_obj = time.gmtime(float(seg.start))
-            converted_start_timestamp = time.strftime("%H:%M:%S",start_timestamp_as_time_obj)
+    # Step 1: Find which result has the smaller length
+    result_1_len = len(comb_list_1)
+    result_2_len = len(comb_list_2)
+    if (result_2_len < result_1_len):
+        length_limit = result_2_len
+        res_with_min_length = 2
+    elif (result_1_len == result_2_len):
+        length_limit = result_1_len
+        res_with_min_length = 0
+    else:
+        length_limit = result_1_len
+        res_with_min_length = 1
 
-            end_timestamp_as_time_obj = time.gmtime(float(seg.end))
-            converted_end_timestamp = time.strftime("%H:%M:%S", end_timestamp_as_time_obj)
+    # Step 2: Create a list of list object starting from length 0 up to the length_limit
+    comb_csv_content = []
+    for i in range(0, length_limit):
+        row_in_res_1 = comb_list_1[i]
+        row_in_res_2 = comb_list_2[i]
+        row_to_combine = row_in_res_1.copy()
+        row_to_combine.append(row_in_res_2[2])
+        comb_csv_content.append(row_to_combine)
 
-            full_timestamp = converted_start_timestamp + "-" + converted_end_timestamp
-            row_to_write.append(full_timestamp)
+    # Step 3: Populate the rest of comb_csv_content with remaining content from the longer of the 2
+    # list objects
+    if (res_with_min_length == 1):
+        # There is some content in comb_list_2 that has not been added to comb_csv_content
+        for i in range(length_limit, result_2_len):
+            row_in_res_2 = comb_list_2[i]
+            row_to_combine = row_in_res_2.copy()
+            row_to_combine.append(row_in_res_2[2])
+            row_to_combine[2] = "N/A" # No longer content from comb_list_2, so 3rd entry of row is N/A
 
-            speaker = comb_result[i][1]
-            row_to_write.append(speaker)
+    elif (res_with_min_length == 2):
+        # There is some content in comb_list_1 that has not been added to comb_csv_content
+        for i in range(length_limit, result_1_len):
+            row_in_res_1 = comb_list_1[i]
+            row_to_combine = row_in_res_1.copy()
+            row_to_combine.append("N/A")
+            comb_csv_content.append(row_to_combine)
+    return comb_csv_content
 
-            speaker_text = comb_result[i][2]
-            row_to_write.append(speaker_text)
-
-            csv_writer.writerow(row_to_write)
-
-def write_list_to_csv(list_of_csv_content, output_csv_path: str, output_csv_headers) -> None:
+def write_list_to_csv(list_of_csv_content: List[List[str]], output_csv_path: str, output_csv_headers: List[str]) -> None:
     """
-    This method writes a list of strings (which is the expected output from the method gen_group_speakers_csv_content
+    This method writes a list of strings (which is the expected output from the method
+    writing_solo_res_to_csv or writing_comb_res_to_csv.
     into a CSV file with path defined by parameter output_csv_path
     :param list_of_csv_content:
     :return:None
@@ -291,31 +309,33 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     if process_selected == "Transcription Only":
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"] # Insert your headers here by replacing values of empty strings. Eg: ["Timestamps", "Speaker No", "Text[Eng]"]
         output_format = "transcription"
-    else:
+    elif process_selected == "Translation Only":
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
         output_format = "translation"
+    else: # reaching here means: process_selected == 'Transcription + Translation Only'
+        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]", "Text[Eng]"]
+        output_format = "transcribe_translate"
 
     now = datetime.now()
     audio_path_last_backslash_index = input_file.rfind("/")
     audio_name = input_file[audio_path_last_backslash_index + 1:]
-    #output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + the_date_time + "_" + ".csv"
-    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + "_" + str(now.minute) + ".csv" #TODO: Bug with: "THIS TOKEN IS INVALID"
-    # print(output_csv_path)
+    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + str(now.minute) + ".csv"
     translate_to_english = to_english_selection    # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
     # Step 2: Check if audio file is in valid format
     is_valid_audio_file = validate_audio_file(input_audio_path)
     if (is_valid_audio_file):
         # Step 3: Defining whisper model
-        loaded_whisper_model = define_whisper_model(model_size_selection)
+        loaded_whisper_model = define_whisper_model(model_size_selection, translate_to_english)
 
         # Step 4: Processing and printing out detected language
-        whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path)
-        print("")
-        print(f'Detected language in input audio file: {whisper_detect_lang}')
-        print("")
-        print("Speaker diarization has started, in progress")
-        print("")
+        if (translate_to_english == "Yes"):
+            print("Detected language in input audio file: English\n")
+        else:
+            whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path)
+            print(f'Detected language in input audio file: {whisper_detect_lang}\n')
+
+        print("Speaker diarization has started, in progress\n")
         diarize_model = diarize_model
         the_audio = whisper.load_audio(input_audio_path, 16000)
         audio_data = {
@@ -323,17 +343,15 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             'sample_rate': 16000
         }
         diarization_result = diarize_model(audio_data)
-        print("Speaker diarization has completed")
-        print("")
+        print("Speaker diarization has completed\n")
 
         # Step 6: Running conditional checks. The code to run will differ based on whether detected language is ENG or not.
-
         if (process_selected == "Transcription Only"):
             print("Transcribing audio file\n")
-            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, None)
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
-                                                                          diarization_result)
-            transcript_csv_content = writing_solo_res(transcript_final_result)
+                                                                             diarization_result)
+            transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
             print("Finished transcribing audio file. Writing output as a CSV file to destination...\n")
             write_list_to_csv(transcript_csv_content, output_csv_path, output_csv_headers)
             print("CSV file has been created. Process is complete\n")
@@ -342,10 +360,31 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
             print("Translating audio file to English\n")
             trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
             trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
-            trans_csv_content = writing_solo_res(trans_lang_final_result)
+            trans_csv_content = writing_solo_res_to_csv(trans_lang_final_result)
             print("Finished translating audio file to English. Writing output as a CSV file to destination...\n")
             write_list_to_csv(trans_csv_content, output_csv_path, output_csv_headers)
             print("CSV file has been created. Process is complete\n")
-        # TODO: Temporarily removed the conditional for the dual transcription + translation process
+
+        else: #If reached here, then process_selected == "translate_+_transcribe"
+            print("Transcribing audio file\n")
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
+                                                                          diarization_result)
+            transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
+            print("Done transcription\n")
+
+            print("Now, translating audio file to English\n")
+            trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
+            trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
+            trans_csv_content = writing_solo_res_to_csv(trans_lang_final_result)
+            print("Done translation\n")
+
+            print("Combining transcription and translation results")
+            combo_csv_content = writing_comb_res_to_csv(transcript_csv_content,trans_csv_content)
+
+            print("Finished both transcription and translation. Writing output as a CSV file to destination...\n")
+            write_list_to_csv(combo_csv_content, output_csv_path, output_csv_headers)
+            print("CSV file has been created. Process is complete\n")
+
     else:
         print("Invalid file format. Please try again")
