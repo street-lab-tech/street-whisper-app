@@ -216,7 +216,8 @@ def writing_solo_res_to_csv(comb_result) -> List:
             # step 5: write entire row into csv
             csv_content.append(row_to_write)
 
-            # step 6: change value of curr_speaker to speaker (officially "switching" the counter variable curr_speaker to reflect actual value from variable speaker)
+            # step 6: change value of curr_speaker to speaker
+            # (officially "switching" the counter variable curr_speaker to reflect actual value from variable speaker)
             curr_speaker = speaker
 
             # step 7: modify the value of the beginning timestamp to reflect when the new speaker starts talking
