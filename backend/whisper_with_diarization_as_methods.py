@@ -251,6 +251,9 @@ def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
     # Step 1: Find which result has the smaller length
     result_1_len = len(comb_list_1)
     result_2_len = len(comb_list_2)
+
+    # Step 2: Based on step 1, assign value to res_with_min_length
+    # If res_with_min_length == 0, both comb_list_1 and comb_list_2 have same length
     if (result_2_len < result_1_len):
         length_limit = result_2_len
         res_with_min_length = 2
@@ -262,6 +265,7 @@ def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
         res_with_min_length = 1
 
     # Step 2: Create a list of list object starting from length 0 up to the length_limit
+    # Writing content from both objects into this list
     comb_csv_content = []
     for i in range(0, length_limit):
         row_in_res_1 = comb_list_1[i]
@@ -270,23 +274,23 @@ def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
         row_to_combine.append(row_in_res_2[2])
         comb_csv_content.append(row_to_combine)
 
-    # Step 3: Populate the rest of comb_csv_content with remaining content from the longer of the 2
-    # list objects
+    # Step 3: Populate the rest of comb_csv_content with remaining content from the longer of the 2 list objects
     if (res_with_min_length == 1):
         # There is some content in comb_list_2 that has not been added to comb_csv_content
         for i in range(length_limit, result_2_len):
             row_in_res_2 = comb_list_2[i]
             row_to_combine = row_in_res_2.copy()
             row_to_combine.append(row_in_res_2[2])
-            row_to_combine[2] = "N/A" # No longer content from comb_list_2, so 3rd entry of row is N/A
+            row_to_combine[2] = "N/A" # No more content from comb_list_1, so 3rd entry of row is N/A
 
     elif (res_with_min_length == 2):
         # There is some content in comb_list_1 that has not been added to comb_csv_content
         for i in range(length_limit, result_1_len):
             row_in_res_1 = comb_list_1[i]
             row_to_combine = row_in_res_1.copy()
-            row_to_combine.append("N/A")
+            row_to_combine.append("N/A") # No more content from comb_list_2, so 3rd entry of row is N/A
             comb_csv_content.append(row_to_combine)
+
     return comb_csv_content
 
 def write_list_to_csv(list_of_csv_content: List[List[str]], output_csv_path: str, output_csv_headers: List[str]) -> None:
@@ -302,13 +306,14 @@ def write_list_to_csv(list_of_csv_content: List[List[str]], output_csv_path: str
         comb_lang_csv_writer.writerow(output_csv_headers)  # Write the header row
         for i in range(len(list_of_csv_content)):
             comb_lang_csv_writer.writerow(list_of_csv_content[i])
+    comb_lang_csv_file.close()
 
 def main(process_selected: str, input_file: str, to_english_selection: bool, model_size_selection: str, destination_selection: str, diarize_model):
     # Step 1: Defining input audio path + defining CSV Headers
     input_audio_path = input_file # Insert audio file name and extension here (extensions can include: .mp3, .wav)
 
     if process_selected == "Transcription Only":
-        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"] # Insert your headers here by replacing values of empty strings. Eg: ["Timestamps", "Speaker No", "Text[Eng]"]
+        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"]
         output_format = "transcription"
     elif process_selected == "Translation Only":
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
@@ -321,7 +326,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     audio_path_last_backslash_index = input_file.rfind("/")
     audio_name = input_file[audio_path_last_backslash_index + 1:]
     output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + str(now.minute) + ".csv"
-    translate_to_english = to_english_selection    # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
+    translate_to_english = to_english_selection  # True denotes audio is only in english. Simply do translation to english
 
     # Step 2: Check if audio file is in valid format
     is_valid_audio_file = validate_audio_file(input_audio_path)
@@ -346,10 +351,10 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         diarization_result = diarize_model(audio_data)
         print("Speaker diarization has completed\n")
 
-        # Step 6: Running conditional checks. The code to run will differ based on whether detected language is ENG or not.
+        # Step 6: Running conditional checks.
         if (process_selected == "Transcription Only"):
             print("Transcribing audio file\n")
-            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=False)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                              diarization_result)
             transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
@@ -368,7 +373,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
 
         else: #If reached here, then process_selected == "translate_+_transcribe"
             print("Transcribing audio file\n")
-            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=False)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                           diarization_result)
             transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
