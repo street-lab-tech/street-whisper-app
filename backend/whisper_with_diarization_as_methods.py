@@ -4,7 +4,7 @@ import csv
 import time
 from datetime import datetime
 import magic
-from typing import List
+from typing import Any, Optional, List
 from pyannote.audio import Pipeline
 from backend.merge_timestamps import diarize_text
 from iso639 import Lang
@@ -79,7 +79,7 @@ def detecting_language(whisper_model, audio_file_path: str) -> str:
     full_language = Lang(detected_lang_code).name # decoding the language code
     return full_language
 
-def transcribe_audio(whisper_model, audio_file_path: str, is_translate):
+def transcribe_audio(whisper_model: Any, audio_file_path: str, is_translate: Optional[bool] = False):
     """
     This method takes an audio file with the path as specified by parameter audio_file_path.
     It also takes a boolean is_translate. If true, we wish to translate the transcribed text to English.
@@ -102,6 +102,7 @@ def transcribe_audio(whisper_model, audio_file_path: str, is_translate):
         transcription = whisper_model.transcribe(audio=audio_file_path, fp16=False, verbose=False)
 
     return transcription
+
 
 def retrieving_speaker_diaz(pipeline_file: str, audio_file_path: str):
     """
@@ -313,7 +314,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     input_audio_path = input_file # Insert audio file name and extension here (extensions can include: .mp3, .wav)
 
     if process_selected == "Transcription Only":
-        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"]
+        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"] # Insert your headers here by replacing values of empty strings. Eg: ["Timestamps", "Speaker No", "Text[Eng]"]
         output_format = "transcription"
     elif process_selected == "Translation Only":
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
@@ -326,7 +327,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     audio_path_last_backslash_index = input_file.rfind("/")
     audio_name = input_file[audio_path_last_backslash_index + 1:]
     output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + str(now.hour) + str(now.minute) + ".csv"
-    translate_to_english = to_english_selection  # True denotes audio is only in english. Simply do translation to english
+    translate_to_english = to_english_selection    # True denotes that if audio file is not in english, you want to translate text to english. If False, text would be transcribed based on autodetected language from Whisper
 
     # Step 2: Check if audio file is in valid format
     is_valid_audio_file = validate_audio_file(input_audio_path)
@@ -351,10 +352,10 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         diarization_result = diarize_model(audio_data)
         print("Speaker diarization has completed\n")
 
-        # Step 6: Running conditional checks.
+        # Step 6: Running conditional checks. The code to run will differ based on whether detected language is ENG or not.
         if (process_selected == "Transcription Only"):
             print("Transcribing audio file\n")
-            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=False)
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                              diarization_result)
             transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
@@ -373,7 +374,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
 
         else: #If reached here, then process_selected == "translate_+_transcribe"
             print("Transcribing audio file\n")
-            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=False)
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                           diarization_result)
             transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
