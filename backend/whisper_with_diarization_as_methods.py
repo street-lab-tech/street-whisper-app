@@ -4,12 +4,11 @@ import csv
 import time
 from datetime import datetime
 import magic
-from typing import Any, List, Optional
+from typing import Any, Optional, List
 from pyannote.audio import Pipeline
 from backend.merge_timestamps import diarize_text
 from iso639 import Lang
 import torch
-
 
 def validate_audio_file(audio_file_path: str) -> bool:
     """
@@ -21,7 +20,9 @@ def validate_audio_file(audio_file_path: str) -> bool:
         other "types" of files has not been implemented yet
     """
     validate_audio_path_msg = magic.from_file(audio_file_path, mime=True)
-    supported_file_extensions = {"mpeg", "mp4", "wav"} #mpeg include checks for mp3, mp4 includes checks for .mp4 and .m4a
+    supported_file_extensions = {"mpeg", "mp4", "wav", "webm", "flac", "ogg", "adts"}
+    #Note: In above line, mpeg include checks for mpeg, mp3 and mpga. mp4 includes checks for .mp4 and .m4a
+    # adts files can include some audio files disguised as mp3/mp4
     for file_ext in supported_file_extensions:
         if file_ext in validate_audio_path_msg:
             return True
@@ -54,7 +55,7 @@ def define_whisper_model(model_path: str, is_english: bool):
         whisper_model = whisper.load_model(model_path)
     return whisper_model
 
-def detecting_language(whisper_model: Any, audio_file_path: str) -> str:
+def detecting_language(whisper_model, audio_file_path: str) -> str:
     """
     This method takes in a Whisper Model instances, and an audio file with the path as specified by parameter
     audio_file_path.
@@ -101,6 +102,7 @@ def transcribe_audio(whisper_model: Any, audio_file_path: str, is_translate: Opt
         transcription = whisper_model.transcribe(audio=audio_file_path, fp16=False, verbose=False)
 
     return transcription
+
 
 def retrieving_speaker_diaz(pipeline_file: str, audio_file_path: str):
     """
@@ -215,7 +217,8 @@ def writing_solo_res_to_csv(comb_result) -> List:
             # step 5: write entire row into csv
             csv_content.append(row_to_write)
 
-            # step 6: change value of curr_speaker to speaker (officially "switching" the counter variable curr_speaker to reflect actual value from variable speaker)
+            # step 6: change value of curr_speaker to speaker
+            # (officially "switching" the counter variable curr_speaker to reflect actual value from variable speaker)
             curr_speaker = speaker
 
             # step 7: modify the value of the beginning timestamp to reflect when the new speaker starts talking
@@ -237,7 +240,6 @@ def writing_solo_res_to_csv(comb_result) -> List:
                 row_to_write.append(speaker_text_seg)
                 csv_content.append(row_to_write)
     return csv_content
-
 def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
     """
     NOTE: This method is a helper method for CSV writing in the case when
@@ -250,6 +252,9 @@ def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
     # Step 1: Find which result has the smaller length
     result_1_len = len(comb_list_1)
     result_2_len = len(comb_list_2)
+
+    # Step 2: Based on step 1, assign value to res_with_min_length
+    # If res_with_min_length == 0, both comb_list_1 and comb_list_2 have same length
     if (result_2_len < result_1_len):
         length_limit = result_2_len
         res_with_min_length = 2
@@ -261,6 +266,7 @@ def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
         res_with_min_length = 1
 
     # Step 2: Create a list of list object starting from length 0 up to the length_limit
+    # Writing content from both objects into this list
     comb_csv_content = []
     for i in range(0, length_limit):
         row_in_res_1 = comb_list_1[i]
@@ -269,23 +275,23 @@ def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
         row_to_combine.append(row_in_res_2[2])
         comb_csv_content.append(row_to_combine)
 
-    # Step 3: Populate the rest of comb_csv_content with remaining content from the longer of the 2
-    # list objects
+    # Step 3: Populate the rest of comb_csv_content with remaining content from the longer of the 2 list objects
     if (res_with_min_length == 1):
         # There is some content in comb_list_2 that has not been added to comb_csv_content
         for i in range(length_limit, result_2_len):
             row_in_res_2 = comb_list_2[i]
             row_to_combine = row_in_res_2.copy()
             row_to_combine.append(row_in_res_2[2])
-            row_to_combine[2] = "N/A" # No longer content from comb_list_2, so 3rd entry of row is N/A
+            row_to_combine[2] = "N/A" # No more content from comb_list_1, so 3rd entry of row is N/A
 
     elif (res_with_min_length == 2):
         # There is some content in comb_list_1 that has not been added to comb_csv_content
         for i in range(length_limit, result_1_len):
             row_in_res_1 = comb_list_1[i]
             row_to_combine = row_in_res_1.copy()
-            row_to_combine.append("N/A")
+            row_to_combine.append("N/A") # No more content from comb_list_2, so 3rd entry of row is N/A
             comb_csv_content.append(row_to_combine)
+
     return comb_csv_content
 
 def write_list_to_csv(list_of_csv_content: List[List[str]], output_csv_path: str, output_csv_headers: List[str]) -> None:
@@ -301,6 +307,7 @@ def write_list_to_csv(list_of_csv_content: List[List[str]], output_csv_path: str
         comb_lang_csv_writer.writerow(output_csv_headers)  # Write the header row
         for i in range(len(list_of_csv_content)):
             comb_lang_csv_writer.writerow(list_of_csv_content[i])
+    comb_lang_csv_file.close()
 
 def main(process_selected: str, input_file: str, to_english_selection: bool, model_size_selection: str, destination_selection: str, diarize_model):
     # Step 1: Defining input audio path + defining CSV Headers
