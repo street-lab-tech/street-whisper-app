@@ -22,6 +22,32 @@ def authorization():
         diarize_model = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token=str(potential_access_token))
         questions_ui(diarize_model)
         typer.Exit()
+    except KeyError: 
+        # You reach here if you click on a selection in the prompt selection instead of 
+        # using your keyboard
+        invalidKeyError  = [
+            {
+                'type': 'list',
+                'name': 'key_error',
+                'message': 'Please only use your keyboard and the enter key when making a selection.',
+                'choices': [
+                    {
+                        'name': 'I would like to try again',
+                    },
+                    {
+                        'name': 'Exit the app',
+                    }
+                ],
+            }
+        ]
+        key_error = prompt(invalidKeyError)
+        if key_error != {} and key_error["key_error"] == 'I would like to try again':
+            authorization()
+        else:
+            typer.Exit()
+        
+    except KeyboardInterrupt:
+        typer.Exit()
     except:
         invalidTokenPrompt = [
             {
@@ -63,11 +89,16 @@ def questions_ui(diarize_model):
                 },
                 {
                     'name': 'Transcription + Translation Only',
+                },
+                {
+                    'name': 'Exit the app',
                 }
             ],
         }
     ]
     process_selected = prompt(translation_transcription_prompt)
+    if process_selected["process_selected"] == 'Exit the app':
+        return 
     # Input file
     rprint("[blue]=============================[blue]")
     rprint(f"[bold]Enter the absolute path to the audio file you want to do the \"{process_selected['process_selected']}\" process on:[bold]")
@@ -87,10 +118,15 @@ def questions_ui(diarize_model):
                 {
                     'name': 'No',
                 },
+                {
+                    'name': 'Exit the app',
+                },         
             ],
         }
     ]
     to_english_selection = prompt(to_eng_selection_prompt)
+    if to_english_selection["to_english_selection"] == 'Exit the app':
+        return
 
     rprint("[blue]=============================[blue]")
     # Model size selection
@@ -109,10 +145,15 @@ def questions_ui(diarize_model):
                 {
                     'name': 'medium',
                 },
+                {
+                    'name': 'Exit the app',
+                },
             ],
         }
     ]
     model_size_selection = prompt(model_size_selection_prompt)
+    if model_size_selection["model_size_selection"] == 'Exit the app':
+        return
     rprint("[blue]=============================[blue]")
     # Destination Folder
     rprint(f"[bold]Enter the absolute path to your destination folder:[bold]")
