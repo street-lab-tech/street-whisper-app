@@ -15,15 +15,23 @@ def startup_ui():
     authorization()
 
 def authorization():
-    rprint(f"What is your access token? An access token from Hugging Face and accepting pyannote/speaker-diarization-3.1's user condition is needed to run the app. If this is not your first time running the app amd have previously entered a valid token, you can just press enter on your keyboard.[bold]")
-    potential_access_token = input()
+    access_token_prompt = [
+        {
+            'type': 'password',
+            'message': 'What is your access token? An access token from Hugging Face and accepting pyannote/speaker-diarization-3.1\'s user condition is needed to run the app. If this is not your first time running the app and have previously entered a valid token, you can just press enter on your keyboard.\n',
+            'name': 'password'
+        }
+    ]
+    potential_access_token = prompt(access_token_prompt)
+    if (potential_access_token["password"].lower() == "exit"):
+        return
     try:
         # Check token
         diarize_model = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token=str(potential_access_token))
         questions_ui(diarize_model)
         typer.Exit()
-    except KeyError: 
-        # You reach here if you click on a selection in the prompt selection instead of 
+    except KeyError:
+        # You reach here if you click on a selection in the prompt selection instead of
         # using your keyboard
         invalidKeyError  = [
             {
@@ -45,7 +53,7 @@ def authorization():
             authorization()
         else:
             typer.Exit()
-        
+
     except KeyboardInterrupt:
         typer.Exit()
     except:
@@ -98,7 +106,7 @@ def questions_ui(diarize_model):
     ]
     process_selected = prompt(translation_transcription_prompt)
     if process_selected["process_selected"] == 'Exit the app':
-        return 
+        return
     # Input file
     rprint("[blue]=============================[blue]")
     rprint(f"[bold]Enter the absolute path to the audio file you want to do the \"{process_selected['process_selected']}\" process on:[bold]")
@@ -120,7 +128,7 @@ def questions_ui(diarize_model):
                 },
                 {
                     'name': 'Exit the app',
-                },         
+                },
             ],
         }
     ]
