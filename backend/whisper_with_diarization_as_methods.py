@@ -4,7 +4,7 @@ import csv
 import time
 from datetime import datetime
 import magic
-from typing import Any, Optional, List
+#from typing import Any, Optional, List
 from pyannote.audio import Pipeline
 from backend.merge_timestamps import diarize_text
 from iso639 import Lang
@@ -79,7 +79,7 @@ def detecting_language(whisper_model, audio_file_path: str) -> str:
     full_language = Lang(detected_lang_code).name # decoding the language code
     return full_language
 
-def transcribe_audio(whisper_model: Any, audio_file_path: str, is_translate: Optional[bool] = False):
+def transcribe_audio(whisper_model, audio_file_path: str, is_translate: bool):
     """
     This method takes an audio file with the path as specified by parameter audio_file_path.
     It also takes a boolean is_translate. If true, we wish to translate the transcribed text to English.
@@ -96,7 +96,7 @@ def transcribe_audio(whisper_model: Any, audio_file_path: str, is_translate: Opt
     Preconditions:
         - Audio file path is defined and links to a .wav file.
     """
-    if is_translate:
+    if is_translate == True:
         transcription = whisper_model.transcribe(audio=audio_file_path, task="translate", fp16=False, verbose=False)
     else:
         transcription = whisper_model.transcribe(audio=audio_file_path, fp16=False, verbose=False)
@@ -134,7 +134,7 @@ def display_timestamps_speaker_and_text(whisper_result, speaker_diaz_result):
     """
     return diarize_text(whisper_result, speaker_diaz_result)
 
-def writing_solo_res_to_csv(comb_result) -> List:
+def writing_solo_res_to_csv(comb_result):
     """
     NOTE: This method is a helper method for CSV writing in the case when
     user selects "Transcription only" or "Translation only".
@@ -240,7 +240,7 @@ def writing_solo_res_to_csv(comb_result) -> List:
                 row_to_write.append(speaker_text_seg)
                 csv_content.append(row_to_write)
     return csv_content
-def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
+def writing_comb_res_to_csv(comb_list_1, comb_list_2):
     """
     NOTE: This method is a helper method for CSV writing in the case when
     user selects "Transcription + Translation".
@@ -294,7 +294,7 @@ def writing_comb_res_to_csv(comb_list_1, comb_list_2) -> List:
 
     return comb_csv_content
 
-def write_list_to_csv(list_of_csv_content: List[List[str]], output_csv_path: str, output_csv_headers: List[str]) -> None:
+def write_list_to_csv(list_of_csv_content, output_csv_path: str, output_csv_headers) -> None:
     """
     This method writes a list of strings (which is the expected output from the method
     writing_solo_res_to_csv or writing_comb_res_to_csv.
@@ -355,7 +355,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         # Step 6: Running conditional checks. The code to run will differ based on whether detected language is ENG or not.
         if (process_selected == "Transcription Only"):
             print("Transcribing audio file\n")
-            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=False)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                              diarization_result)
             transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
@@ -374,7 +374,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
 
         else: #If reached here, then process_selected == "translate_+_transcribe"
             print("Transcribing audio file\n")
-            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path)
+            transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=False)
             transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
                                                                           diarization_result)
             transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
