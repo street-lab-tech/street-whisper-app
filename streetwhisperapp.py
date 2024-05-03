@@ -92,7 +92,7 @@ def questions_ui(diarize_model):
                 },
                 {
                     'name': 'Exit the app',
-                },
+                }
             ],
         }
     ]
