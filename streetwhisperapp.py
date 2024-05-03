@@ -18,7 +18,7 @@ def authorization():
     access_token_prompt = [
         {
             'type': 'password',
-            'message': 'What is your access token? An access token from Hugging Face and accepting pyannote/speaker-diarization-3.1\'s user condition is needed to run the app. If this is not your first time running the app and have previously entered a valid token, you can just press enter on your keyboard.\n',
+            'message': 'What is your access token? An access token from Hugging Face and accepting pyannote/speaker-diarization-3.1\'s user condition is needed to run the app. If this is not your first time running the app and you have previously entered a valid token, press enter on your keyboard.\n',
             'name': 'password'
         }
     ]
