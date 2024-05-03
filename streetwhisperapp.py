@@ -23,7 +23,7 @@ def authorization():
         }
     ]
     potential_access_token = prompt(access_token_prompt)
-    if (potential_access_token["password"].lower() == "exit"):
+    if (potential_access_token == {} or potential_access_token["password"].lower() == "exit"):
         return
     try:
         # Check token
