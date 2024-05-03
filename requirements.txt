@@ -12,7 +12,6 @@ pyannote.audio==3.1.1
 iso639-lang
 python-magic-bin==0.4.14
 
-typing
 datetime
 torch
 ffmpeg
