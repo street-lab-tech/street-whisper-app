@@ -337,6 +337,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
 
     # Constructing output csv path string
     output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + "_" + str(now.hour) + "_" + str(now.minute) + ".csv"
+    print("This will be the output path: ", output_csv_path)
     translate_to_english = to_english_selection # True denotes that file is in ENG. Only transcription is needed
 
     # Step 2: Check if audio file is in valid format
