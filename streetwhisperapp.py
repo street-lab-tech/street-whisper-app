@@ -183,6 +183,10 @@ def questions_ui(diarize_model):
             print("You entered an invalid audio path. Please try again")
 
     # Check if the referenced audio file itself is one that Whisper can process
+    is_valid_audio_file = validate_audio_file(input_audio_path)
+    if not (is_valid_audio_file):
+        print("The file type is not supported by Whisper. If you think this is not the case, please contact the developers")
+        return
 
     rprint("[blue]=============================[blue]")
     # Is Input File in English?
