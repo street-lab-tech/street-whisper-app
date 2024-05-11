@@ -1,1 +1,0 @@
-# Due to file size, the Whisper models for "small.pt", "medium.pt", and "large-v2.pt" were not uploaded.
