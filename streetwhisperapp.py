@@ -1,4 +1,6 @@
 from backend import whisper_with_diarization_as_methods
+import os
+import sys
 import typer
 from PyInquirer import prompt
 from rich import print as rprint
@@ -22,6 +24,31 @@ def startup_ui(howtouse: bool = typer.Option(False, '-howtouse', help="How to us
         # When -credits is used, it will display the credits section
         credits_ui()
 
+def validate_path(input_path: str, is_intended_file: bool) -> bool:
+    """
+    This function checks whether the path specified by string: input_path
+    is defined in the user's system.
+
+    If is_intended_audio_file is true, then the expected path should point to a file.
+    We can adjust the testing of the file_path based on this parameter
+
+    TBD: It also checks whether the user has the valid permissions corresponding to the path
+    """
+    if (is_intended_file):
+        # In this branch, check whether path points to a valid file
+        # We test that this file is an audio file later on (in validate_audio_file)
+        is_file = os.path.isfile(input_path)
+        if is_file:
+            return True
+        else:
+            return False
+    else:
+        # In this branch, check whether path points to a valid directory
+        is_directory = os.path.isdir(input_path)
+        if is_directory:
+            return True
+        else:
+            return False
 def authorization():
     access_token_prompt = [
         {
@@ -118,7 +145,22 @@ def questions_ui(diarize_model):
     # Input file
     rprint("[blue]=============================[blue]")
     rprint(f"[bold]Enter the absolute path to the audio file you want to do the \"{process_selected['process_selected']}\" process on:[bold]")
-    input_file = input()
+    while True:
+        input_file = input()
+        input_audio_path = input_file.strip()  # remove leading and trailing whitespace
+        # Check 1 for input file: Validate whether path is valid
+        audio_path_last_backslash_index = input_file.rfind("/")
+        audio_name = input_file[audio_path_last_backslash_index + 1:]
+        audio_name = audio_name.strip()  # remove leading and trailing whitespace
+        # TODO: Purposefully left out the "replace <spaces> with <"_"> since that might interfere with the path checking
+        input_audio_path = (input_audio_path.strip())[0: input_audio_path.rfind("/") + 1] + audio_name
+        print("Revised input audio path: ", input_audio_path)
+        is_valid_audio_path = validate_path(input_audio_path, True)
+        if is_valid_audio_path:
+            break
+        else:
+            print("You entered an invalid audio path. Please try again")
+
 
     rprint("[blue]=============================[blue]")
     # Is Input File in English?
@@ -173,7 +215,14 @@ def questions_ui(diarize_model):
     rprint("[blue]=============================[blue]")
     # Destination Folder
     rprint(f"[bold]Enter the absolute path to your destination folder:[bold]")
-    destination_selection = input()
+    while True:
+        destination_selection = input()
+        destination_selection = destination_selection.strip() # remove leading and trailing whitespace
+        is_valid_dest_path = validate_path(destination_selection, False)
+        if is_valid_dest_path:
+            break
+        else:
+            print("You entered an invalid destination path. Please try again")
 
     rprint("[blue]=============================[blue]")
     questions_finished_prompt = [
