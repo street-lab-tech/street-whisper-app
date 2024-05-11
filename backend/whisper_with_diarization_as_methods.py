@@ -335,6 +335,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     destination_selection = destination_selection.strip()
 
     # Constructing output csv path string
+    # TODO: There is a bug with this (has to do when there is a space in the audio name)
     output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + "_" + str(now.hour) + "_" + str(now.minute) + ".csv"
     print("This will be the output path: ", output_csv_path)
     translate_to_english = to_english_selection # True denotes that file is in ENG. Only transcription is needed
