@@ -163,6 +163,9 @@ def questions_ui(diarize_model):
     # Input file
     rprint("[blue]=============================[blue]")
     rprint(f"[bold]Enter the absolute path to the audio file you want to do the \"{process_selected['process_selected']}\" process on:[bold]")
+
+    # Check if audio file path is a valid path within system that CLI is running from
+
     while True:
         input_file = input()
         input_audio_path = input_file.strip()  # remove leading and trailing whitespace
@@ -179,6 +182,7 @@ def questions_ui(diarize_model):
         else:
             print("You entered an invalid audio path. Please try again")
 
+    # Check if the referenced audio file itself is one that Whisper can process
 
     rprint("[blue]=============================[blue]")
     # Is Input File in English?
@@ -233,9 +237,11 @@ def questions_ui(diarize_model):
     rprint("[blue]=============================[blue]")
     # Destination Folder
     rprint(f"[bold]Enter the absolute path to your destination folder:[bold]")
+
+    # Check if dest file path is a valid path within system that CLI is running from
     while True:
         destination_selection = input()
-        destination_selection = destination_selection.strip() # remove leading and trailing whitespace
+        destination_selection = destination_selection.strip()  # remove leading and trailing whitespace
         is_valid_dest_path = validate_path(destination_selection, False)
         if is_valid_dest_path:
             break
