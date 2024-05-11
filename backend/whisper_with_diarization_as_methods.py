@@ -311,10 +311,10 @@ def write_list_to_csv(list_of_csv_content, output_csv_path: str, output_csv_head
 def main(process_selected: str, input_file: str, to_english_selection: bool, model_size_selection: str, destination_selection: str, diarize_model):
 
     # Step 1: Defining input audio path + defining CSV Headers
-    input_audio_path = input_file # Insert audio file name and extension here (extensions can include: .mp3, .wav)
+    input_audio_path = input_file
 
     if process_selected == "Transcription Only":
-        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"] # Insert your headers here by replacing values of empty strings. Eg: ["Timestamps", "Speaker No", "Text[Eng]"]
+        output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"]
         output_format = "transcription"
     elif process_selected == "Translation Only":
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Eng]"]
