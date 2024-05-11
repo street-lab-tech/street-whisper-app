@@ -7,12 +7,20 @@ from pyannote.audio import Pipeline
 
 app = typer.Typer()
 
-@app.command("start")
-def startup_ui():
-    rprint("[magenta]=============================[magenta]")
-    rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
-    rprint("[magenta]=============================[magenta]")
-    authorization()
+def startup_ui(howtouse: bool = typer.Option(False, '-howtouse', help="How to use the tool"),
+               credits: bool = typer.Option(False, '-credits', help="Credits")):
+    if not howtouse and not credits:
+        # When no option is passed in, the app will start
+        rprint("[magenta]=============================[magenta]")
+        rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
+        rprint("[magenta]=============================[magenta]")
+        authorization()
+    if howtouse and not credits:
+        # When -howtouse is used, it will display the help section
+        howtouse_ui()
+    if not howtouse and credits:
+        # When -credits is used, it will display the credits section
+        credits_ui()
 
 def authorization():
     access_token_prompt = [
@@ -191,14 +199,27 @@ def questions_ui(diarize_model):
         # Exit out of app
         typer.Exit()
 
-@app.command("help")
-def help_ui():
+#TODO: Need to complete this method later
+# How to use (previously: help) section
+# (note: this is different from the option --help, which list out all the options the user can use)
+# Called by using the option -howtouse
+def howtouse_ui():
     rprint("[magenta]=============================[magenta]")
     rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
     rprint("")
-    rprint("[bold]Help[bold]")
+    rprint("[bold]How to Use[bold]")
     rprint("[magenta]=============================[magenta]")
 
+# Credits section
+# Called by using the option -credits
+def credits_ui():
+    rprint("[magenta]=============================[magenta]")
+    rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
+    rprint("")
+    rprint("[bold]Credits[bold]")
+    rprint("This application was created by STREET Lab: https://www.streetlab.tech/ ")
+    rprint("For details about the technologies and libraries used, visit the following repository: https://github.com/moonsdust/street-whisper-app")
+    rprint("[magenta]=============================[magenta]")
 
 if __name__ == "__main__":
-    app()
+    typer.run(startup_ui)
