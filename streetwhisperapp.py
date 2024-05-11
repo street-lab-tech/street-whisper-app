@@ -9,7 +9,7 @@ app = typer.Typer()
 
 def startup_ui(howtouse: bool = typer.Option(False, '-howtouse', help="How to use the tool"),
                credits: bool = typer.Option(False, '-credits', help="Credits")):
-    if not howtouse and not credits: 
+    if not howtouse and not credits:
         # When no option is passed in, the app will start
         rprint("[magenta]=============================[magenta]")
         rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
@@ -199,7 +199,8 @@ def questions_ui(diarize_model):
         # Exit out of app
         typer.Exit()
 
-# How to use (previously: help) section 
+#TODO: Need to complete this method later
+# How to use (previously: help) section
 # (note: this is different from the option --help, which list out all the options the user can use)
 # Called by using the option -howtouse
 def howtouse_ui():
@@ -208,7 +209,7 @@ def howtouse_ui():
     rprint("")
     rprint("[bold]How to Use[bold]")
     rprint("[magenta]=============================[magenta]")
-    
+
 # Credits section
 # Called by using the option -credits
 def credits_ui():
@@ -216,8 +217,8 @@ def credits_ui():
     rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
     rprint("")
     rprint("[bold]Credits[bold]")
-    rprint("This application was created by STREET Lab (https://www.streetlab.tech/).")
-    rprint("For details about the technologies and libraries used, visit the following repository: https://github.com/moonsdust/street-whisper-app.")
+    rprint("This application was created by STREET Lab: https://www.streetlab.tech/ ")
+    rprint("For details about the technologies and libraries used, visit the following repository: https://github.com/moonsdust/street-whisper-app")
     rprint("[magenta]=============================[magenta]")
 
 if __name__ == "__main__":
