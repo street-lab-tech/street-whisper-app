@@ -4,7 +4,6 @@ import csv
 import time
 from datetime import datetime
 import magic
-#from typing import Any, Optional, List
 from pyannote.audio import Pipeline
 from backend.merge_timestamps import diarize_text
 from iso639 import Lang
