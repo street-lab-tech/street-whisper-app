@@ -7,7 +7,7 @@ from pyannote.audio import Pipeline
 
 app = typer.Typer()
 
-def startup_ui(howtouse: bool = typer.Option(False, '-howtouse', help="Explains how to use tool"),
+def startup_ui(howtouse: bool = typer.Option(False, '-howtouse', help="How to use the tool"),
                credits: bool = typer.Option(False, '-credits', help="Credits")):
     if not howtouse and not credits: 
         # When no option is passed in, the app will start
