@@ -1,6 +1,6 @@
 from backend import whisper_with_diarization_as_methods
 import os
-import sys
+import magic
 import typer
 from PyInquirer import prompt
 from rich import print as rprint
@@ -49,6 +49,24 @@ def validate_path(input_path: str, is_intended_file: bool) -> bool:
             return True
         else:
             return False
+
+def validate_audio_file(audio_file_path: str) -> bool:
+    """
+    This function utilizes calls from the python-magic-bin==0.4.14 library to check whether or not the file denoted
+    by the path: audio_file_path is a valid audio file that can be interpreted by Whisper.
+
+    Preconditions:
+        - Audio file inputs are either .wav or .mp3. Whisper can process more audio file inputs, but the checking for
+        other "types" of files has not been implemented yet
+    """
+    validate_audio_path_msg = magic.from_file(audio_file_path, mime=True)
+    supported_file_extensions = {"mpeg", "mp4", "wav", "webm", "flac", "ogg", "adts"}
+    #Note: In above line, mpeg include checks for mpeg, mp3 and mpga. mp4 includes checks for .mp4 and .m4a
+    # adts files can include some audio files disguised as mp3/mp4
+    for file_ext in supported_file_extensions:
+        if file_ext in validate_audio_path_msg:
+            return True
+    return False
 def authorization():
     access_token_prompt = [
         {
