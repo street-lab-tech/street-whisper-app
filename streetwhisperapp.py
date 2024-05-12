@@ -31,8 +31,6 @@ def validate_path(input_path: str, is_intended_file: bool) -> bool:
 
     If is_intended_audio_file is true, then the expected path should point to a file.
     We can adjust the testing of the file_path based on this parameter
-
-    TBD: It also checks whether the user has the valid permissions corresponding to the path
     """
     if (is_intended_file):
         # In this branch, check whether path points to a valid file
