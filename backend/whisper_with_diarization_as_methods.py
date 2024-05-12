@@ -335,18 +335,10 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     destination_selection = destination_selection.strip()
 
     # Constructing output csv path string
-    # TODO: There is a bug with this (has to do when there is a space in the audio name)
     output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + "_" + str(now.hour) + "_" + str(now.minute) + ".csv"
     print("This will be the output path: ", output_csv_path)
     translate_to_english = to_english_selection # True denotes that file is in ENG. Only transcription is needed
 
-    # # Step 2: Check if audio file is in valid format
-    # # Remove leading and trailing whitespace from input audio path
-    # input_audio_path = input_audio_path.strip()
-    # input_audio_path = (input_audio_path.strip())[0: input_audio_path.rfind("/") + 1] + audio_name
-    # is_valid_audio_file = validate_audio_file(input_audio_path)
-
-    # if (is_valid_audio_file):
     # Step 3: Defining whisper model
     loaded_whisper_model = define_whisper_model(model_size_selection, translate_to_english)
 
@@ -407,6 +399,3 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         print("Finished both transcription and translation. Writing output as a CSV file to destination...\n")
         write_list_to_csv(combo_csv_content, output_csv_path, output_csv_headers)
         print("CSV file has been created. Process is complete\n")
-
-    # else:
-    #     print("Invalid file format or input file could not be found. Please try again")
