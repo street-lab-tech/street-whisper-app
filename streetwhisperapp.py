@@ -133,6 +133,9 @@ def authorization():
             typer.Exit()
 
 def questions_ui(diarize_model):
+    """This function asks prompts about the audio file that the user wants to translate
+    or perform transcription on and conducts file checks. Afterwards, information
+    is passed to backend."""
     rprint("[magenta]=============================[magenta]")
     rprint(f"You can now go offline.[bold]")
     rprint("[magenta]=============================[magenta]")
