@@ -11,6 +11,7 @@ app = typer.Typer()
 
 def startup_ui(howtouse: bool = typer.Option(False, '-howtouse', help="How to use the tool"),
                credits: bool = typer.Option(False, '-credits', help="Credits")):
+    """This function creates a UI based on the command given by the user."""
     if not howtouse and not credits:
         # When no option is passed in, the app will start
         rprint("[magenta]=============================[magenta]")
@@ -65,7 +66,9 @@ def validate_audio_file(audio_file_path: str) -> bool:
         if file_ext in validate_audio_path_msg:
             return True
     return False
+
 def authorization():
+    """This function deals with access token authentication, catching errors, keyboard interruptions, and more."""
     access_token_prompt = [
         {
             'type': 'password',
@@ -274,11 +277,12 @@ def questions_ui(diarize_model):
         # Exit out of app
         typer.Exit()
 
-#TODO: Need to complete this method later
+#TODO: Need to complete this function later
 # How to use (previously: help) section
 # (note: this is different from the option --help, which list out all the options the user can use)
 # Called by using the option -howtouse
 def howtouse_ui():
+    """This function creates the how to use section."""
     rprint("[magenta]=============================[magenta]")
     rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
     rprint("")
@@ -288,6 +292,7 @@ def howtouse_ui():
 # Credits section
 # Called by using the option -credits
 def credits_ui():
+    """This function creates the credits section."""
     rprint("[magenta]=============================[magenta]")
     rprint("[bold][underline]STREET Lab Whisper App[underline][bold]")
     rprint("")
