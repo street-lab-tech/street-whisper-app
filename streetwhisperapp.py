@@ -184,7 +184,7 @@ def questions_ui(diarize_model):
         if is_valid_audio_path:
             break
         else:
-            print("You entered an invalid audio path. Please try again")
+            print("You entered an invalid audio path. Please try again:")
 
     # Check if the referenced audio file itself is one that Whisper can process
     is_valid_audio_file = validate_audio_file(input_audio_path)
@@ -254,7 +254,7 @@ def questions_ui(diarize_model):
         if is_valid_dest_path:
             break
         else:
-            print("You entered an invalid destination path. Please try again")
+            print("You entered an invalid destination path. Please try again:")
 
     rprint("[blue]=============================[blue]")
     questions_finished_prompt = [
