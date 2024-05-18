@@ -172,14 +172,7 @@ def questions_ui(diarize_model):
 
     while True:
         input_file = input()
-        input_audio_path = input_file.strip()  # remove leading and trailing whitespace
-        # Check 1 for input file: Validate whether path is valid
-        # audio_path_last_backslash_index = input_file.rfind("/")
-        # audio_name = input_file[audio_path_last_backslash_index + 1:]
-        # audio_name = audio_name.strip()  # remove leading and trailing whitespace
-        # TODO: Purposefully left out the "replace <spaces> with <"_"> since that might interfere with the path checking
-        # TODO: Moreover, having spaces in path name still yields an actual valid path (at least for MacOS)
-        # input_audio_path = (input_audio_path.strip())[0: input_audio_path.rfind("/") + 1] + audio_name
+        input_audio_path = input_file.strip()  # remove leading and trailing whitespace from the input path ONLY
         is_valid_audio_path = validate_path(input_audio_path, True)
         if is_valid_audio_path:
             break
