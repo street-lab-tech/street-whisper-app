@@ -10,12 +10,8 @@ Link to the repository containing the original scripts used for the backend: htt
 This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 installed on your device. You can install Python 3.9 from here: https://www.python.org/downloads/. Make sure to install the **64 bit version of Python 3.9** if you are using Windows. 
 
 1. Accept the conditions for ```speaker-diarization-3.1``` on Hugging Face, which can be found here: https://huggingface.co/pyannote/speaker-diarization-3.1 and then head to your Hugging Face account's settings, then to the Access Tokens section, and then create a New Token (the type can be either Read or Write but we recommend you setting the type to Read). You will need to enter this token the first time you run the app.
-   
-### For MacOS 
-2. Open your terminal. This can be found by going to launchpad and searching for "terminal".
-### For Window
-2. Download Windows Terminal (https://apps.microsoft.com/detail/9n0dx20hk701?rtc=1&hl=en-ca&gl=CA) and open it.
-
+2. **For MacOS**: Open your terminal. This can be found by going to launchpad and searching for "terminal".
+2. **For Window**: Download Windows Terminal (https://apps.microsoft.com/detail/9n0dx20hk701?rtc=1&hl=en-ca&gl=CA) and open it.
 3. To run the app from the terminal:
     1. ```cd``` is a command used that will allow you to move between directories. We will use the command ```cd``` to eventually end up in the street-whisper-app folder. To do this locate where the street-whisper-app folder is on your computer. 
         - Example: Say the ```street-whisper-app``` folder is located in your GitHub folder, which is in your documents folder on your computer, this would be the order of commands you will enter (Note: you enter after writing every command): ```cd documents -> cd GitHub -> cd street-whisper-app```.
