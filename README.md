@@ -1,10 +1,19 @@
-# STREET Whisper Transcription App
+# STREET Lab Whisper App
 Link to the repository containing the original scripts used for the backend: https://github.com/carmen-chau/StreetWhisperCode
 
 ## Structure of Repository 
 - ```backend```: A folder that contains all files related to the backend of the application such as scripts that does translation, transcription, etc. 
 - ```streetwhisperapp.py```: Script for the command line interface of the application.
 - ```requirements.txt```: All the dependencies that needs to be installed to run the app.
+
+## Available Commands
+STREET Lab Whisper App currently supports the following commands if you are interacting with streetwhisperapp.py directly:
+Command  | What it does
+------------- | -------------
+`python streetwhisperapp` | To start running the tool 
+`python streetwhisperapp -howtouse` | Explains how to use tool
+`python streetwhisperapp -credits`  | Displays the credits
+`python streetwhisperapp --help` | Shows all the available options the tool has 
 
 ## How To Run App
 This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 installed on your device. You can install Python 3.9 from here: https://www.python.org/downloads/. Make sure to install the **64 bit version of Python 3.9** if you are using Windows. 
@@ -20,6 +29,5 @@ This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 instal
     4. Now we will need to install the necessary dependencies if you have just created a new virtual environment (NOTE: you only need to install dependencies once if you do not create a new virtual environment and use the same one). To do this, run the following command: ```pip install -r requirements.txt``` and then to install Whisper in the virtual environment, run the following: ```pip install -q git+https://github.com/openai/whisper.git```
     5. From there enter the following command: ```python streetwhisperapp.py``` to start the app.
     6. If this is your first time running the app on your device, enter the access token from Hugging Face when prompted by the app. If you have entered a valid token in the past, you can just click enter when the app ask for an access token.
-  
 
 Note: The app can run offline after a valid access token has been entered.
