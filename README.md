@@ -7,7 +7,7 @@ Link to the repository containing the original scripts used for the backend: htt
 - ```requirements.txt```: All the dependencies that needs to be installed to run the app.
 
 ## Available Commands
-STREET Lab Whisper App currently supports the following commands if you are interacting with streetwhisperapp.py directly:
+STREET Lab Whisper App currently supports the following commands if you are interacting with ```streetwhisperapp.py``` directly:
 Command  | What it does
 ------------- | -------------
 `python streetwhisperapp` | To start running the tool 
