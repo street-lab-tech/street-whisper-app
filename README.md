@@ -15,7 +15,7 @@ Command  | What it does
 `python streetwhisperapp -credits`  | Displays the credits
 `python streetwhisperapp --help` | Shows all the available options the tool has 
 
-## How To Run App
+## How To Run
 This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 installed on your device. You can install Python 3.9 from here: https://www.python.org/downloads/. Make sure to install the **64 bit version of Python 3.9** if you are using Windows. 
 
 1. Accept the conditions for ```speaker-diarization-3.1``` on Hugging Face, which can be found here: https://huggingface.co/pyannote/speaker-diarization-3.1 and then head to your Hugging Face account's settings, then to the Access Tokens section, and then create a New Token (the type can be either Read or Write but we recommend you setting the type to Read). You will need to enter this token the first time you run the app.
