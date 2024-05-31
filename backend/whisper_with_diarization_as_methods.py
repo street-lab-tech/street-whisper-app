@@ -293,8 +293,7 @@ def write_list_to_csv(list_of_csv_content, output_csv_path: str, output_csv_head
 def main(process_selected: str, input_file: str, to_english_selection: bool, model_size_selection: str, destination_selection: str, diarize_model):
 
     # Step 1: Defining input audio path + defining CSV Headers
-    input_file = os.path.normpath(input_file)
-    input_audio_path = input_file
+    input_audio_path = os.path.normpath(input_file)
 
     if process_selected == "Transcription Only":
         output_csv_headers = ["Timestamps", "Speaker No", "Text[Orig Lang]"]
@@ -309,15 +308,15 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     now = datetime.now()
     # Check OS. The checks for the input file name will depend on the OS
     if (os.name == 'posix'):
-        audio_path_last_backslash_index = input_file.rfind("/") # Initial assumption: current OS is unix-like
+        audio_path_last_backslash_index = input_audio_path.rfind("/") # Initial assumption: current OS is unix-like
     elif (os.name == "nt"):
         # The current OS is Windows
-        audio_path_last_backslash_index = input_file.rfind("\\")
+        audio_path_last_backslash_index = input_audio_path.rfind("\\")
     else:
         print("This OS is not supported in the application yet")
         return #TODO: Will need to clean this up after we do further testing on windows
 
-    audio_name = input_file[audio_path_last_backslash_index + 1:]
+    audio_name = input_audio_path[audio_path_last_backslash_index + 1:]
 
     # Remove leading and trailing whitespace from audio_name
     audio_name = audio_name.strip()
