@@ -307,11 +307,16 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         output_format = "transcribe_translate"
 
     now = datetime.now()
-    # Check OS
-    audio_path_last_backslash_index = input_file.rfind("/") # Initial assumption: current OS is unix-like
-    if (os.name == "nt"):
+    # Check OS. The checks for the input file name will depend on the OS
+    if (os.name == 'posix'):
+        audio_path_last_backslash_index = input_file.rfind("/") # Initial assumption: current OS is unix-like
+    elif (os.name == "nt"):
         # The current OS is Windows
         audio_path_last_backslash_index = input_file.rfind("\\")
+    else:
+        print("This OS is not supported in the application yet")
+        return #TODO: Will need to clean this up after we do further testing on windows
+
     audio_name = input_file[audio_path_last_backslash_index + 1:]
 
     # Remove leading and trailing whitespace from audio_name
@@ -322,7 +327,14 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     destination_selection = destination_selection.strip()
 
     # Constructing output csv path string
-    output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + "_" + str(now.hour) + "_" + str(now.minute) + ".csv"
+    if (os.name == 'posix'):
+        output_csv_path = destination_selection + "/" + audio_name + "_" + output_format + "_" + str(now.hour) + "_" + str(now.minute) + ".csv"
+    elif (os.name == "nt"):
+        output_csv_path = destination_selection + "\\" + audio_name + "_" + output_format + "_" + str(now.hour) + "_" + str(now.minute) + ".csv"
+    else:
+        print("Not sure how to create output path, unknown OS detected")
+        return  # TODO: Will need to clean this up after we do further testing on windows
+
     print("This will be the output path: ", output_csv_path)
     translate_to_english = to_english_selection # True denotes that file is in ENG. Only transcription is needed
 
