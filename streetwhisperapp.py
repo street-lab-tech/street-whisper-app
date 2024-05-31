@@ -60,16 +60,16 @@ def validate_audio_file(audio_file_path: str) -> bool:
     """
     try:
         validate_audio_path_msg = magic.from_file(audio_file_path, mime=True)
+        supported_file_extensions = {"mpeg", "mp4", "wav", "webm", "flac", "ogg", "adts"}
+        #Note: In above line, mpeg include checks for mpeg, mp3 and mpga. mp4 includes checks for .mp4 and .m4a
+        # adts files can include some audio files disguised as mp3/mp4
+        for file_ext in supported_file_extensions:
+            if file_ext in validate_audio_path_msg:
+                return True
+        return False
     except: 
         print("There was an error reading in the name of the file because it contains a non UTF-8 character. Update the file name and try again.")
         typer.Exit()
-    supported_file_extensions = {"mpeg", "mp4", "wav", "webm", "flac", "ogg", "adts"}
-    #Note: In above line, mpeg include checks for mpeg, mp3 and mpga. mp4 includes checks for .mp4 and .m4a
-    # adts files can include some audio files disguised as mp3/mp4
-    for file_ext in supported_file_extensions:
-        if file_ext in validate_audio_path_msg:
-            return True
-    return False
 
 def authorization():
     """This function deals with access token authentication, catching errors, keyboard interruptions, and more."""
