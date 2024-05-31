@@ -15,7 +15,3 @@ python-magic-bin==0.4.14
 datetime
 torch
 ffmpeg
-
-csv
-time
-os
