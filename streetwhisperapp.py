@@ -58,7 +58,11 @@ def validate_audio_file(audio_file_path: str) -> bool:
         - Audio file inputs are either .wav or .mp3. Whisper can process more audio file inputs, but the checking for
         other "types" of files has not been implemented yet
     """
-    validate_audio_path_msg = magic.from_file(audio_file_path, mime=True)
+    try:
+        validate_audio_path_msg = magic.from_file(audio_file_path, mime=True)
+    except: 
+        print("There was an error reading in the name of the file because it contains a non UTF-8 character. Update the file name and try again.")
+        typer.Exit()
     supported_file_extensions = {"mpeg", "mp4", "wav", "webm", "flac", "ogg", "adts"}
     #Note: In above line, mpeg include checks for mpeg, mp3 and mpga. mp4 includes checks for .mp4 and .m4a
     # adts files can include some audio files disguised as mp3/mp4
