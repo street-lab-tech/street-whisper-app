@@ -66,10 +66,11 @@ def validate_audio_file(audio_file_path: str) -> bool:
         for file_ext in supported_file_extensions:
             if file_ext in validate_audio_path_msg:
                 return True
+        print("The file type is not supported by Whisper. If you think this is not the case, please contact the developers.")
         return False
     except: 
         print("There was an error reading in the name of the file because it contains a non UTF-8 character. Update the file name and try again.")
-        typer.Exit()
+        return False
 
 def authorization():
     """This function deals with access token authentication, catching errors, keyboard interruptions, and more."""
@@ -186,7 +187,6 @@ def questions_ui(diarize_model):
     # Check if the referenced audio file itself is one that Whisper can process
     is_valid_audio_file = validate_audio_file(input_audio_path)
     if not (is_valid_audio_file):
-        print("The file type is not supported by Whisper. If you think this is not the case, please contact the developers")
         return
 
     rprint("[blue]=============================[blue]")
