@@ -11,9 +11,9 @@ STREET Lab Whisper App currently supports the following commands if you are inte
 Command  | What it does
 ------------- | -------------
 `python streetwhisperapp.py` | To start running the tool 
-`python streetwhisperapp -howtouse` | Explains how to use the tool
-`python streetwhisperapp -credits`  | Displays the credits
-`python streetwhisperapp --help` | Shows all the available options the tool has 
+`python streetwhisperapp.py -howtouse` | Explains how to use the tool
+`python streetwhisperapp.py -credits`  | Displays the credits
+`python streetwhisperapp.py --help` | Shows all the available options the tool has 
 
 ## How To Run
 This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 installed on your device. You can install Python 3.9 from here: https://www.python.org/downloads/. Make sure to install the **64 bit version of Python 3.9** if you are using Windows. 
