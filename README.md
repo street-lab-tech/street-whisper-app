@@ -10,7 +10,7 @@ Link to the repository containing the original scripts used for the backend: htt
 STREET Lab Whisper App currently supports the following commands if you are interacting with ```streetwhisperapp.py``` directly:
 Command  | What it does
 ------------- | -------------
-`python streetwhisperapp` | To start running the tool 
+`python streetwhisperapp.py` | To start running the tool 
 `python streetwhisperapp -howtouse` | Explains how to use the tool
 `python streetwhisperapp -credits`  | Displays the credits
 `python streetwhisperapp --help` | Shows all the available options the tool has 
