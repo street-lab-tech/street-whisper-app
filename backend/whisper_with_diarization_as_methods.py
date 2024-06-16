@@ -344,7 +344,7 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     if (translate_to_english == "Yes"):
         print("Detected language in input audio file: English\n")
     else:
-        whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path) # TODO: THERE IS A BUG HERE
+        whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path)
         print(f'Detected language in input audio file: {whisper_detect_lang}\n')
 
     print("Speaker diarization has started, in progress\n")
