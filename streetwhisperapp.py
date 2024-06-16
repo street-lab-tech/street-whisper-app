@@ -298,7 +298,7 @@ def credits_ui():
     rprint("")
     rprint("[bold]Credits[bold]")
     rprint("This application was created by STREET Lab: https://www.streetlab.tech/ ")
-    rprint("For details about the technologies and libraries used, visit the following repository: https://github.com/moonsdust/street-whisper-app")
+    rprint("For details about the technologies and libraries used, visit the following repository: https://github.com/street-lab-tech/street-whisper-app")
     rprint("[magenta]=============================[magenta]")
 
 if __name__ == "__main__":
