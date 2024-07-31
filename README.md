@@ -16,7 +16,7 @@ Command  | What it does
 `python streetwhisperapp.py --help` | Shows all the available options the tool has 
 
 ## How To Run
-This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 installed on your device. You can install Python 3.9 from here: https://www.python.org/downloads/. Make sure to install the **64 bit version of Python 3.9** if you are using Windows. 
+This app currently runs on ~Python 3.9 (or more specifically Python 3.9.7). Please be sure to have Python 3.9 installed on your device. You can install Python 3.9 from here: https://www.python.org/downloads/. Make sure to install the **64 bit version of Python 3.9** if you are using Windows. 
 
 1. Accept the conditions for ```speaker-diarization-3.1``` on Hugging Face, which can be found here: https://huggingface.co/pyannote/speaker-diarization-3.1 and then head to your Hugging Face account's settings, then to the Access Tokens section, and then create a New Token (the type can be either Read or Write but we recommend you setting the type to Read). You will need to enter this token the first time you run the app.
 2. **For MacOS**: Open your terminal. This can be found by going to launchpad and searching for "terminal".
@@ -30,7 +30,9 @@ This app currently runs on ~Python 3.9. Please be sure to have Python 3.9 instal
         - In other times when you run the app, you do not need to create a new virtual environment again and you can use ```source <virtual-environment-name>/bin/activate``` (if you are using MacOS) or ```.\<virtual-environment-name>\Scripts\Activate.ps1``` (if you are using Windows) to activate the virtual environment.
     4. **For Windows**: If the command to activate the virtual environment doesn't run, run the following command: ```Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser``` to set your execution policy and try activating the virtual environment. 
     5. Now we will need to install the necessary dependencies if you have just created a new virtual environment (NOTE: you only need to install dependencies once if you do not create a new virtual environment and use the same one). To do this, run the following command: ```pip install -r requirements.txt``` and then to install Whisper in the virtual environment, run the following: ```pip install -q git+https://github.com/openai/whisper.git```
-    6. From there enter the following command: ```python streetwhisperapp.py``` to start the app.
-    7. If this is your first time running the app on your device, enter the access token from Hugging Face when prompted by the app. If you have entered a valid token in the past, you can just click enter when the app ask for an access token.
+    6. **For Windows**: Download ffmpeg manually from https://ffmpeg.org/download.html (Specifically the Windows builds from gyan.dev)
+    7. **For Windows**: Move the ```ffmpeg.exe``` file located in the folder you downloaded into your virtual environment's Scripts folder (ex: If your virtual environment is called ```venvname``` then you would move ```ffmpeg.exe``` into ```myvenv\Scripts```)
+    8. From there enter the following command: ```python streetwhisperapp.py``` to start the app.
+    9. If this is your first time running the app on your device, enter the access token from Hugging Face when prompted by the app. If you have entered a valid token in the past, you can just click enter when the app ask for an access token.
 
 Note: The app can run offline after a valid access token has been entered.
