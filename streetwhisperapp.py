@@ -88,7 +88,22 @@ def authorization():
         # Check token
         diarize_model = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token=str(potential_access_token["password"]))
         questions_ui(diarize_model)
-        typer.Exit()
+        # Ask if user wish to exit that now the process is successfully completed 
+        ask_to_exit_prompt  = [
+            {
+                'type': 'list',
+                'name': 'exit_prompt',
+                'message': 'Process is complete.',
+                'choices': [
+                    {
+                        'name': 'Exit out of the app.',
+                    }
+                ],
+            }
+        ]
+        exit_prompt = prompt(ask_to_exit_prompt)
+        if exit_prompt != {} and exit_prompt["exit_prompt"] == 'Exit out of the app.':
+            typer.Exit()
     except KeyError:
         # You reach here if you click on a selection in the prompt selection instead of
         # using your keyboard

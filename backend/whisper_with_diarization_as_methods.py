@@ -396,4 +396,4 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
 
         print("Finished both transcription and translation. Writing output as a CSV file to destination...\n")
         write_list_to_csv(combo_csv_content, output_csv_path, output_csv_headers)
-        print("CSV file has been created. Process is complete\n")
+        print("CSV file has been created.\n")
