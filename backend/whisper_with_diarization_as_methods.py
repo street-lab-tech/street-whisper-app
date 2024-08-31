@@ -2,9 +2,9 @@
 import whisper
 import csv
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from pyannote.audio import Pipeline
-from backend.merge_timestamps import diarize_text
+from backend.merge_timestamps import diarize_text, get_text_with_timestamp, merge_sentence
 from iso639 import Lang
 import torch
 import os
@@ -289,8 +289,24 @@ def write_list_to_csv(list_of_csv_content, output_csv_path: str, output_csv_head
         for i in range(len(list_of_csv_content)):
             comb_lang_csv_writer.writerow(list_of_csv_content[i])
     comb_lang_csv_file.close()
+    
+def obtain_translation_transcription_content_multiple_speakers(whisper_result, diarization_result) -> list: 
+    """This function returns a list that is formatted for the output CSV file for multiple speakers."""
+    final_result = display_timestamps_speaker_and_text(whisper_result, diarization_result)
+    csv_content = writing_solo_res_to_csv(final_result)
+    return csv_content
+    
+def obtain_translation_transcription_content_single_speaker(whisper_result) -> list: 
+    """This function returns a list that is formatted for the output CSV file for a single speaker."""
+    # 1 speaker 
+    timestamp_texts = get_text_with_timestamp(whisper_result)
+    spk_text = []
+    for seg, text in timestamp_texts:
+        spk_text.append((seg, "SPEAKER_00", text))
+    csv_content = writing_solo_res_to_csv(merge_sentence(spk_text))
+    return csv_content
 
-def main(process_selected: str, input_file: str, to_english_selection: bool, model_size_selection: str, destination_selection: str, diarize_model):
+def main(process_selected: str, input_file: str, to_english_selection: bool, num_speakers_selection: str, model_size_selection: str, destination_selection: str, diarize_model):
 
     # Step 1: Defining input audio path + defining CSV Headers
     input_audio_path = os.path.normpath(input_file)
@@ -347,23 +363,30 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
         whisper_detect_lang = detecting_language(loaded_whisper_model, input_audio_path)
         print(f'Detected language in input audio file: {whisper_detect_lang}\n')
 
-    print("Speaker diarization has started, in progress\n")
-    diarize_model = diarize_model
-    the_audio = whisper.load_audio(input_audio_path, 16000)
-    audio_data = {
-        'waveform': torch.from_numpy(the_audio[None, :]),
-        'sample_rate': 16000
-    }
-    diarization_result = diarize_model(audio_data)
-    print("Speaker diarization has completed\n")
+    # Step 5: Check if the user selected option where input file has 2 or more speakers
+    # or number of speakers is unknown
+    if (num_speakers_selection != "1 speaker"):
+        # Run diarization if we have 2 or more speakers or an unknown number of speakers
+        print("Speaker diarization has started, in progress\n")
+        diarize_model = diarize_model
+        the_audio = whisper.load_audio(input_audio_path, 16000)
+        audio_data = {
+            'waveform': torch.from_numpy(the_audio[None, :]),
+            'sample_rate': 16000
+        }
+        diarization_result = diarize_model(audio_data)
+        print("Speaker diarization has completed\n")
 
     # Step 6: Running conditional checks. The code to run will differ based on whether detected language is ENG or not.
     if (process_selected == "Transcription Only"):
         print("Transcribing audio file\n")
         transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=False)
-        transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
-                                                                             diarization_result)
-        transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
+        if (num_speakers_selection != "1 speaker"): 
+            # Multiple speakers and/or unknown number of speakers
+            transcript_csv_content = obtain_translation_transcription_content_multiple_speakers(transcript_whisper_result, diarization_result)
+        else: 
+            # 1 speaker
+            transcript_csv_content = obtain_translation_transcription_content_single_speaker(transcript_whisper_result)
         print("Finished transcribing audio file. Writing output as a CSV file to destination...\n")
         write_list_to_csv(transcript_csv_content, output_csv_path, output_csv_headers)
         print("CSV file has been created. Process is complete\n")
@@ -371,8 +394,12 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     elif (process_selected == "Translation Only" or translate_to_english == "Yes"):
         print("Translating audio file to English\n")
         trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
-        trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
-        trans_csv_content = writing_solo_res_to_csv(trans_lang_final_result)
+        if (num_speakers_selection != "1 speaker"): 
+            # Multiple speakers and/or unknown number of speakers
+            trans_csv_content = obtain_translation_transcription_content_multiple_speakers(trans_whisper_result, diarization_result)
+        else:
+            # 1 speaker
+            trans_csv_content = obtain_translation_transcription_content_single_speaker(trans_whisper_result)
         print("Finished translating audio file to English. Writing output as a CSV file to destination...\n")
         write_list_to_csv(trans_csv_content, output_csv_path, output_csv_headers)
         print("CSV file has been created. Process is complete\n")
@@ -380,15 +407,22 @@ def main(process_selected: str, input_file: str, to_english_selection: bool, mod
     else: #If reached here, then process_selected == "translate_+_transcribe"
         print("Transcribing audio file\n")
         transcript_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=False)
-        transcript_final_result = display_timestamps_speaker_and_text(transcript_whisper_result,
-                                                                          diarization_result)
-        transcript_csv_content = writing_solo_res_to_csv(transcript_final_result)
+        if (num_speakers_selection != "1 speaker"): 
+            # Multiple speakers and/or unknown number of speakers
+            transcript_csv_content = obtain_translation_transcription_content_multiple_speakers(transcript_whisper_result, diarization_result)
+        else: 
+            # 1 speaker
+            transcript_csv_content = obtain_translation_transcription_content_single_speaker(transcript_whisper_result)
         print("Done transcription\n")
 
         print("Now, translating audio file to English\n")
         trans_whisper_result = transcribe_audio(loaded_whisper_model, input_audio_path, is_translate=True)
-        trans_lang_final_result = display_timestamps_speaker_and_text(trans_whisper_result, diarization_result)
-        trans_csv_content = writing_solo_res_to_csv(trans_lang_final_result)
+        if (num_speakers_selection != "1 speaker"): 
+            # Multiple speakers and/or unknown number of speakers
+            trans_csv_content = obtain_translation_transcription_content_multiple_speakers(trans_whisper_result, diarization_result)
+        else:
+            # 1 speaker
+            trans_csv_content = obtain_translation_transcription_content_single_speaker(trans_whisper_result)
         print("Done translation\n")
 
         print("Combining transcription and translation results")
