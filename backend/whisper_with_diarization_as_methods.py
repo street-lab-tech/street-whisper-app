@@ -299,10 +299,10 @@ def obtain_translation_transcription_content_multiple_speakers(whisper_result, d
 def obtain_translation_transcription_content_single_speaker(whisper_result) -> list: 
     """This function returns a list that is formatted for the output CSV file for a single speaker."""
     timestamp_texts = get_text_with_timestamp(whisper_result)
-    spk_text = []
+    all_text = []
     for seg, text in timestamp_texts:
-        spk_text.append((seg, "SPEAKER_00", text))
-    csv_content = writing_solo_res_to_csv(merge_sentence(spk_text))
+        all_text.append((seg, "SPEAKER_00", text))
+    csv_content = writing_solo_res_to_csv(merge_sentence(all_text))
     return csv_content
 
 def main(process_selected: str, input_file: str, to_english_selection: bool, num_speakers_selection: str, model_size_selection: str, destination_selection: str, diarize_model):
