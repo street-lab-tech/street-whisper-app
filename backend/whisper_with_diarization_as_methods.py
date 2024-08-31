@@ -2,7 +2,7 @@
 import whisper
 import csv
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pyannote.audio import Pipeline
 from backend.merge_timestamps import diarize_text, get_text_with_timestamp, merge_sentence
 from iso639 import Lang
