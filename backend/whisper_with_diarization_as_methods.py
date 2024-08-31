@@ -283,7 +283,7 @@ def write_list_to_csv(list_of_csv_content, output_csv_path: str, output_csv_head
     :param list_of_csv_content:
     :return:None
     """
-    with open(output_csv_path, "w") as comb_lang_csv_file:
+    with open(output_csv_path, "w", encoding = "utf-8") as comb_lang_csv_file:
         comb_lang_csv_writer = csv.writer(comb_lang_csv_file)
         comb_lang_csv_writer.writerow(output_csv_headers)  # Write the header row
         for i in range(len(list_of_csv_content)):
