@@ -96,13 +96,13 @@ def authorization():
                 'message': 'Process is complete.',
                 'choices': [
                     {
-                        'name': 'Exit out of the app.',
+                        'name': 'Exit the app.',
                     }
                 ],
             }
         ]
         exit_prompt = prompt(ask_to_exit_prompt)
-        if exit_prompt != {} and exit_prompt["exit_prompt"] == 'Exit out of the app.':
+        if exit_prompt != {} and exit_prompt["exit_prompt"] == 'Exit the app.':
             typer.Exit()
     except KeyError:
         # You reach here if you click on a selection in the prompt selection instead of
@@ -130,26 +130,42 @@ def authorization():
 
     except KeyboardInterrupt:
         typer.Exit()
-    except:
+    except TypeError:
         invalidTokenPrompt = [
             {
                 'type': 'list',
                 'name': 'invalid_token',
-                'message': 'This token is invalid. Do you want to try again?',
+                'message': 'This token is invalid or there is an internal error (if you have seen this message previously).',
                 'choices': [
                     {
-                        'name': 'Yes',
+                        'name': 'Try again',
                     },
                     {
-                        'name': 'No',
+                        'name': 'Exit the app',
                     }
                 ],
             }
         ]
         invalid_token = prompt(invalidTokenPrompt)
-        if invalid_token["invalid_token"] == 'Yes':
+        if invalid_token != {} and invalid_token["invalid_token"] == 'Try again':
             authorization()
         else:
+            typer.Exit()
+    except:
+        internalErrorPrompt = [
+            {
+                'type': 'list',
+                'name': 'internal_error',
+                'message': 'There is an internal error with the application. Please email streetlabtech@gmail.com about the error.',
+                'choices': [
+                    {
+                        'name': 'Exit the app.',
+                    }
+                ],
+            }
+        ]
+        internal_error = prompt(internalErrorPrompt)
+        if internal_error != {} and internal_error["internal_error"] == 'Exit the app.':
             typer.Exit()
 
 def questions_ui(diarize_model):
