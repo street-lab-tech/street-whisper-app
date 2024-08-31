@@ -298,7 +298,6 @@ def obtain_translation_transcription_content_multiple_speakers(whisper_result, d
     
 def obtain_translation_transcription_content_single_speaker(whisper_result) -> list: 
     """This function returns a list that is formatted for the output CSV file for a single speaker."""
-    # 1 speaker 
     timestamp_texts = get_text_with_timestamp(whisper_result)
     spk_text = []
     for seg, text in timestamp_texts:
