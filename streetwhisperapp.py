@@ -88,7 +88,22 @@ def authorization():
         # Check token
         diarize_model = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token=str(potential_access_token["password"]))
         questions_ui(diarize_model)
-        typer.Exit()
+        # Ask if user wish to exit that now the process is successfully completed 
+        ask_to_exit_prompt  = [
+            {
+                'type': 'list',
+                'name': 'exit_prompt',
+                'message': 'Process is complete.',
+                'choices': [
+                    {
+                        'name': 'Exit out of the app.',
+                    }
+                ],
+            }
+        ]
+        exit_prompt = prompt(ask_to_exit_prompt)
+        if exit_prompt != {} and exit_prompt["exit_prompt"] == 'Exit out of the app.':
+            typer.Exit()
     except KeyError:
         # You reach here if you click on a selection in the prompt selection instead of
         # using your keyboard
@@ -212,6 +227,33 @@ def questions_ui(diarize_model):
     to_english_selection = prompt(to_eng_selection_prompt)
     if to_english_selection["to_english_selection"] == 'Exit the app':
         return
+    
+    rprint("[blue]=============================[blue]")
+    # Number of speakers
+    num_speakers_prompt = [
+        {
+            'type': 'list',
+            'name': 'num_speakers_selection',
+            'message': 'How many speakers are present in the audio file?',
+            'choices': [
+                {
+                    'name': '1 speaker',
+                },
+                {
+                    'name': '2+ speakers',
+                },
+                {
+                    'name': 'Unknown number of speakers',
+                },
+                {
+                    'name': 'Exit the app',
+                },
+            ],
+        }
+    ]
+    num_speakers_selection = prompt(num_speakers_prompt)
+    if num_speakers_selection["num_speakers_selection"] == 'Exit the app':
+        return
 
     rprint("[blue]=============================[blue]")
     # Model size selection
@@ -272,7 +314,7 @@ def questions_ui(diarize_model):
     questions_finished = prompt(questions_finished_prompt)
     if questions_finished["questions_finished"] == 'Yes':
         # Run process
-        whisper_with_diarization_as_methods.main(process_selected["process_selected"], input_file, to_english_selection["to_english_selection"], model_size_selection["model_size_selection"], destination_selection, diarize_model)
+        whisper_with_diarization_as_methods.main(process_selected["process_selected"], input_file, to_english_selection["to_english_selection"], num_speakers_selection["num_speakers_selection"], model_size_selection["model_size_selection"], destination_selection, diarize_model)
     else:
         # Exit out of app
         typer.Exit()
