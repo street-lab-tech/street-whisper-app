@@ -135,7 +135,7 @@ def authorization():
             {
                 'type': 'list',
                 'name': 'invalid_token',
-                'message': 'This token is invalid or there is an internal error (if you have seen this message previously).',
+                'message': 'This token is invalid or there is an internal error (if you have seen this message previously). Please email streetlabtech@gmail.com about the error.',
                 'choices': [
                     {
                         'name': 'Try again',
@@ -357,6 +357,7 @@ def credits_ui():
     rprint("[bold]Credits[bold]")
     rprint("This application was created by STREET Lab: https://www.streetlab.tech/ ")
     rprint("For details about the technologies and libraries used, visit the following repository: https://github.com/street-lab-tech/street-whisper-app")
+    rprint("To contact STREET Lab about any errors, questions, or feedback you may have, please email streetlabtech@gmail.com")
     rprint("[magenta]=============================[magenta]")
 
 if __name__ == "__main__":
